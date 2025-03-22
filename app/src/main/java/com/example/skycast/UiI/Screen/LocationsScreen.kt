@@ -48,7 +48,7 @@ fun LocationsScreen(navController: NavController, viewModel: WeatherViewModel) {
                         .padding(10.dp)
                         .background(Color(0xFF2A2D43), shape = RoundedCornerShape(10.dp))
                         .clickable {
-                            viewModel.fetchWeather("Montreal, Canada", "YOUR_API_KEY")
+//                            viewModel.fetchWeather( , )
                             navController.popBackStack()
                         }
                         .padding(16.dp),

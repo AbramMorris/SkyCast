@@ -1,10 +1,13 @@
 package com.example.skycast.Model
 
+
 data class WeatherForecastResponse(
     val city: City,
-    val list: List<ForecastItem>, ){
-
-
+    val cnt: Int,
+    val cod: String,
+    val list: List<ForecastItem>,
+    val message: Int
+) {
     data class City(
         val coord: Coord,
         val country: String,
@@ -30,6 +33,26 @@ data class WeatherForecastResponse(
         val wind: Wind
     )
 
+    data class Coord(
+        val lat: Double,
+        val lon: Double
+    )
+
+    data class Clouds(
+        val all: Int
+    )
+
+    data class Main(
+        val feels_like: Double,
+        val grnd_level: Int,
+        val humidity: Int,
+        val pressure: Int,
+        val sea_level: Int,
+        val temp: Double,
+        val temp_kf: Double,
+        val temp_max: Double,
+        val temp_min: Double
+    )
 
     data class Rain(
         val `3h`: Double
@@ -39,5 +62,22 @@ data class WeatherForecastResponse(
         val `3h`: Double
     )
 
+    data class Sys(
+        val pod: String
+    )
 
+    data class Weather(
+        val description: String,
+        val icon: String,
+        val id: Int,
+        val main: String
+    )
+
+    data class Wind(
+        val deg: Int,
+        val gust: Double,
+        val speed: Double
+    )
 }
+
+

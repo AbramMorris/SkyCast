@@ -1,23 +1,11 @@
 package com.example.skycast.UiI.Nav
 
-import android.annotation.SuppressLint
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.material.icons.*
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -27,15 +15,9 @@ import com.example.skycast.UiI.Screen.LocationsScreen
 import com.example.skycast.UiI.Screen.SplashScreen
 import com.example.skycast.ViewModel.WeatherViewModel
 import com.example.skycast.ui.theme.BlueBlackBack
-import com.exyte.animatednavbar.AnimatedNavigationBar
-import com.exyte.animatednavbar.animation.balltrajectory.Parabolic
-import com.exyte.animatednavbar.animation.indendshape.Height
-import com.exyte.animatednavbar.animation.indendshape.shapeCornerRadius
-import com.exyte.animatednavbar.utils.noRippleClickable
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -44,22 +26,18 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavController
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import com.example.skycast.R
-import com.example.skycast.Remote.WeatherApiServes
+import com.example.skycast.UiI.Screen.SettingsScreen
 import com.example.skycast.ui.theme.BlueLight
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavGraph(navController: NavHostController, viewModel: WeatherViewModel) {
     NavHost(navController = navController, startDestination = ScreenRoute.Splash.route) {
         composable(ScreenRoute.Splash.route) { SplashScreen(navController) }
         composable(ScreenRoute.Home.route) { HomeForecastScreen(navController, viewModel) }
         composable(ScreenRoute.Locations.route) { LocationsScreen(navController, viewModel) }
+        composable(ScreenRoute.Setting.route) { SettingsScreen(navController, viewModel) }
     }
 }
 @Composable
@@ -83,7 +61,7 @@ fun navBar(navController: NavHostController){
         NavigationItem(
             title = ("setting"),
             icon = Icons.Default.Settings,
-            route = ScreenRoute.Home
+            route = ScreenRoute.Setting
         )
     )
     val selectedNavigationIndex = rememberSaveable {
@@ -120,8 +98,6 @@ fun navBar(navController: NavHostController){
     }
 
 }
-
-
 
 data class NavigationItem(
     val title: String,
