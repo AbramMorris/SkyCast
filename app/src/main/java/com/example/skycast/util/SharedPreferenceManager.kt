@@ -29,6 +29,14 @@ fun mapTemperatureUnit(temperature: String): String {
     }
 }
 
+fun setUnitSymbol(temperature: String): String {
+    return when(temperature){
+        "°C" -> "°C"
+        "°F" -> "°F"
+        "K" -> "K"
+        else -> "°C"
+    }
+}
 //private val _selectedTemperatureUnit = MutableStateFlow(sharedPref.getTemperatureUnit())
 //val selectedTemperatureUnit: StateFlow<String> = _selectedTemperatureUnit
 

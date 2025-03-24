@@ -50,6 +50,7 @@ import com.example.skycast.viewmodel.WeatherViewModelFactory
 import com.example.skycast.viewmodel.getDayNameFromDate
 import com.example.skycast.ui.theme.BlueBlackBack
 import com.example.skycast.util.getTemperatureUnit
+import com.example.skycast.util.setUnitSymbol
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -160,7 +161,7 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
 
                     // Temperature
                     Text(
-                        text = "${weather.main.temp.toInt()}°C",
+                        text = "${weather.main.temp.toInt()} ${setUnitSymbol(getTemperatureUnit(context,"Temp")?:"C")}",
                         fontSize = 65.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White,

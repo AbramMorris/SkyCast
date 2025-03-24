@@ -1,5 +1,6 @@
 package com.example.skycast.repo
 
+import android.util.Log
 import com.example.skycast.models.WeatherForecastResponse
 import com.example.skycast.models.WeatherResponse
 import com.example.skycast.remotes.WeatherRemoteDataSource
@@ -16,6 +17,7 @@ class WeatherRepositoryImpl(private val remoteDataSource: WeatherRemoteDataSourc
     WeatherRepository {
 
     override fun getCurrentWeather( long :Double, lat :Double,unit: String): Flow<Result<WeatherResponse>> = flow {
+        Log.i("unitRepo","unit = $unit")
         emit(Result.success(remoteDataSource.getCurrentWeather(long, lat,unit).body()!!))
     }.catch { e ->
         emit(Result.failure(e))
