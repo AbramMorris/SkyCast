@@ -1,4 +1,4 @@
-package com.example.skycast.Model
+package com.example.skycast.models
 
 data class WeatherResponse(
     val base: String,

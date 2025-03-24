@@ -1,6 +1,7 @@
-package com.example.skycast.UiI.Screen
+package com.example.skycast.uiI.screens
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -30,26 +31,25 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.skycast.Model.WeatherDetailItem
-import com.example.skycast.Model.WeatherForecastResponse
-import com.example.skycast.Model.WeatherResponse
+import com.example.skycast.models.WeatherDetailItem
+import com.example.skycast.models.WeatherForecastResponse
+import com.example.skycast.models.WeatherResponse
 import com.example.skycast.R
-import com.example.skycast.Remote.WeatherApiServes
-import com.example.skycast.Remote.WeatherRemoteDataSourceImpl
-import com.example.skycast.Reposatory.WeatherRepositoryImpl
-import com.example.skycast.Utlis.LocationHelper
-import com.example.skycast.ViewModel.WeatherViewModel
-import com.example.skycast.ViewModel.WeatherViewModelFactory
-import com.example.skycast.ViewModel.getDayNameFromDate
+import com.example.skycast.remotes.WeatherApiServes
+import com.example.skycast.remotes.WeatherRemoteDataSourceImpl
+import com.example.skycast.repo.WeatherRepositoryImpl
+import com.example.skycast.util.LocationHelper
+import com.example.skycast.viewmodel.WeatherViewModel
+import com.example.skycast.viewmodel.WeatherViewModelFactory
+import com.example.skycast.viewmodel.getDayNameFromDate
 import com.example.skycast.ui.theme.BlueBlackBack
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import com.example.skycast.util.getTemperatureUnit
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -67,22 +67,24 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
     val key = "6d0017f68dd3859d46f1f479f8cac002"
     val context = LocalContext.current
     var locationHelper = LocationHelper(context)
+//    val sharedPref = remember { SharedPreferenceManager(context) }
+//    val temperatureUnit = remember { sharedPref.getTemperatureUnit() }
 
 
 
     LaunchedEffect(Unit) {
         locationHelper.getFreshLocation { location ->
             if (location != null) {
-                viewModel.fetchWeather(location.latitude, location.longitude)
-                viewModel.fetchWeatherForecast(location.latitude, location.longitude, key)
+                viewModel.fetchWeather(location.latitude, location.longitude , getTemperatureUnit(context,"Temp")
+                    ?:"metric" )
+                viewModel.fetchWeatherForecast(location.latitude, location.longitude,
+                    getTemperatureUnit(context,"Temp") ?:"metric")
             }
             else{
-                viewModel.fetchWeather(-0.13,51.51 )
-                viewModel.fetchWeatherForecast(51.51, -0.13, key)
+                viewModel.fetchWeather(-0.13,51.51 ,"metric")
+                viewModel.fetchWeatherForecast(51.51, -0.13,"metric")
             }
         }
-//        viewModel.fetchWeather(-0.13,51.51 )
-//        viewModel.fetchWeatherForecast(51.51, -0.13, key)
     }
 
     Box(
@@ -104,7 +106,7 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
             )
         } else if (errorMessage != null) {
             Text(
-                text = errorMessage ?: "Unknown error",
+                text = errorMessage ?: stringResource(R.string.unknown_error),
                 color = Color.Red,
                 modifier = Modifier.align(Alignment.Center)
             )
@@ -124,6 +126,7 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
                         color = Color.White,
                         modifier = Modifier.padding(top = 48.dp)
                     )
+                    Log.d("TAG", "HomeForecastScreen: ${weather.name}")
 
                     // Weather Image
                     Image(
@@ -141,7 +144,7 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
                             }
                         })
                             ,
-                        contentDescription = "Weather Icon",
+                        contentDescription = stringResource(R.string.weather_icon),
                         modifier = Modifier
                             .size(150.dp)
                             .padding(top = 8.dp)
@@ -149,7 +152,7 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
 
                     // Weather Description
                     Text(
-                        text = weather.weather.firstOrNull()?.description ?: "No description",
+                        text = weather.weather.firstOrNull()?.description ?: stringResource(R.string.no_description),
                         fontSize = 19.sp,
                         color = Color.White,
                         modifier = Modifier.padding(top = 8.dp)
@@ -157,19 +160,25 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
 
                     // Temperature
                     Text(
-                        text = "${weather.main.temp}°C",
+                        text = "${weather.main.temp.toInt()}°C",
                         fontSize = 65.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
                         modifier = Modifier.padding(top = 8.dp)
                     )
+//                    Text(
+//                        text = "Current Temperature: ${viewModel.displayedTemperature}",
+//                        fontSize = 18.sp,
+//                        fontWeight = FontWeight.Bold,
+//                        color = Color.White
+//                    )
 
                     // Weather Details Row
                     WeatherDetailsRow(weather)
 
                     // Today's Forecast
                     Text(
-                        text = "Today",
+                        text = stringResource(R.string.today),
                         fontSize = 20.sp,
                         color = Color.White,
                         modifier = Modifier
@@ -192,7 +201,7 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
 
                     // Weekly Forecast
                     Text(
-                        text = "Weekly Forecast",
+                        text = stringResource(R.string.weekly_forecast),
                         fontSize = 20.sp,
                         color = Color.White,
                         modifier = Modifier
@@ -251,7 +260,7 @@ fun FutureModelViewHolder(forecast: WeatherForecastResponse.ForecastItem) {
                     R.drawable.cloudy_sunny
                 }
             }),
-            contentDescription = "Weather Icon",
+            contentDescription = stringResource(R.string.weather_icon),
             modifier = Modifier.size(50.dp)
         )
         Text(
@@ -317,18 +326,14 @@ fun WeeklyForecast(forecastState: WeatherForecastResponse? ) {
                             }
                         }
                         ),
-                        contentDescription = "Weather Icon"
+                        contentDescription = stringResource(R.string.weather_icon)
                     )
                 }
             }
         }
     }
 }
-fun getDayName(timestamp: Long): String {
-    val sdf = SimpleDateFormat("EEEE", Locale.getDefault())
-    val date = Date(timestamp * 1000)
-    return sdf.format(date)
-}
+
 
 
 

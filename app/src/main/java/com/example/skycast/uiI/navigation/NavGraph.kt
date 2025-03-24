@@ -1,4 +1,4 @@
-package com.example.skycast.UiI.Nav
+package com.example.skycast.uiI.navigation
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -10,10 +10,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.skycast.ScreenRoute
-import com.example.skycast.UiI.Screen.HomeForecastScreen
-import com.example.skycast.UiI.Screen.LocationsScreen
-import com.example.skycast.UiI.Screen.SplashScreen
-import com.example.skycast.ViewModel.WeatherViewModel
+import com.example.skycast.uiI.screens.HomeForecastScreen
+import com.example.skycast.uiI.screens.FavouriteLocationScreen
+import com.example.skycast.uiI.screens.SplashScreen
+import com.example.skycast.viewmodel.WeatherViewModel
 import com.example.skycast.ui.theme.BlueBlackBack
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Favorite
@@ -26,7 +26,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import com.example.skycast.UiI.Screen.SettingsScreen
+import com.example.skycast.uiI.screens.SettingsScreen
 import com.example.skycast.ui.theme.BlueLight
 
 
@@ -36,7 +36,7 @@ fun AppNavGraph(navController: NavHostController, viewModel: WeatherViewModel) {
     NavHost(navController = navController, startDestination = ScreenRoute.Splash.route) {
         composable(ScreenRoute.Splash.route) { SplashScreen(navController) }
         composable(ScreenRoute.Home.route) { HomeForecastScreen(navController, viewModel) }
-        composable(ScreenRoute.Locations.route) { LocationsScreen(navController, viewModel) }
+        composable(ScreenRoute.Locations.route) { FavouriteLocationScreen(navController, viewModel) }
         composable(ScreenRoute.Setting.route) { SettingsScreen(navController, viewModel) }
     }
 }

@@ -1,7 +1,7 @@
-package com.example.skycast.Remote
+package com.example.skycast.remotes
 
-import com.example.skycast.Model.WeatherForecastResponse
-import com.example.skycast.Model.WeatherResponse
+import com.example.skycast.models.WeatherForecastResponse
+import com.example.skycast.models.WeatherResponse
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -13,14 +13,18 @@ interface WeatherApiServes {
     suspend fun getWeather(
         @Query("lat") latitude: Double,
         @Query("lon") longitude: Double,
-        @Query("appid") apiKey: String="6d0017f68dd3859d46f1f479f8cac002",
+        @Query("units") units: String,
+        @Query("appid") apiKey: String="6d0017f68dd3859d46f1f479f8cac002"
+
     ): Response<WeatherResponse>
 
     @GET("forecast")
     suspend fun getWeatherForecast(
         @Query("lat") latitude: Double,
         @Query("lon") longitude: Double,
-        @Query("appid") apiKey: String="6d0017f68dd3859d46f1f479f8cac002",
+        @Query("units") units: String,
+        @Query("appid") apiKey: String="6d0017f68dd3859d46f1f479f8cac002"
+
     ): Response<WeatherForecastResponse>
 
     companion object{

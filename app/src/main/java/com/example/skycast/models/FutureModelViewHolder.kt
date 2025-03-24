@@ -1,4 +1,4 @@
-package com.example.skycast.Model
+package com.example.skycast.models
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

@@ -1,4 +1,4 @@
-package com.example.skycast.UiI.Screen
+package com.example.skycast.uiI.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme

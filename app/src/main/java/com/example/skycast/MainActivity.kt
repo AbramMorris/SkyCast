@@ -22,15 +22,15 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.skycast.Remote.WeatherApiServes
-import com.example.skycast.Remote.WeatherRemoteDataSourceImpl
-import com.example.skycast.Reposatory.WeatherRepositoryImpl
-import com.example.skycast.UiI.Nav.AppNavGraph
-import com.example.skycast.UiI.Nav.navBar
-import com.example.skycast.Utlis.LocationHelper
-import com.example.skycast.Utlis.REQUEST_LOCATION_PERMISSION
-import com.example.skycast.ViewModel.WeatherViewModel
-import com.example.skycast.ViewModel.WeatherViewModelFactory
+import com.example.skycast.remotes.WeatherApiServes
+import com.example.skycast.remotes.WeatherRemoteDataSourceImpl
+import com.example.skycast.repo.WeatherRepositoryImpl
+import com.example.skycast.uiI.navigation.AppNavGraph
+import com.example.skycast.uiI.navigation.navBar
+import com.example.skycast.util.LocationHelper
+import com.example.skycast.util.REQUEST_LOCATION_PERMISSION
+import com.example.skycast.viewmodel.WeatherViewModel
+import com.example.skycast.viewmodel.WeatherViewModelFactory
 
 
 class MainActivity : ComponentActivity() {
@@ -109,7 +109,8 @@ class MainActivity : ComponentActivity() {
                 val currentBackStackEntry = navController.currentBackStackEntryAsState()
                 val currentRoute = currentBackStackEntry.value?.destination?.route
                 if (currentRoute != ScreenRoute.Splash.route){
-                navBar(navController)}
+                navBar(navController)
+                }
             }
         ) { paddingValues ->
             Box(modifier = Modifier.padding(paddingValues)) {

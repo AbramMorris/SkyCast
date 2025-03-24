@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -8,6 +11,9 @@ plugins {
 android {
     namespace = "com.example.skycast"
     compileSdk = 35
+    val file = rootProject.file("local.properties")
+    val properties = Properties()
+    properties.load(FileInputStream(file))
 
     defaultConfig {
         applicationId = "com.example.skycast"
@@ -15,8 +21,8 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "API_KEY", properties.getProperty("API_KEY"))
     }
 
     buildTypes {
@@ -37,6 +43,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -90,6 +97,9 @@ dependencies {
     implementation ("androidx.compose.runtime:runtime-livedata:$compose_version")
     implementation("com.exyte:animated-navigation-bar:1.0.0")
     implementation ("com.google.android.gms:play-services-location:21.1.0")
+    implementation("com.google.maps.android:maps-compose:6.4.1")
+    implementation("com.google.maps.android:places-compose:0.1.3")
+
 
 
 }

@@ -1,4 +1,4 @@
-package com.example.skycast.Utlis
+package com.example.skycast.util
 
 import android.annotation.SuppressLint
 import android.content.Context

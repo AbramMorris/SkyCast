@@ -1,6 +1,6 @@
-package com.example.skycast.Response
+package com.example.skycast.response
 
-import com.example.skycast.Model.WeatherResponse
+import com.example.skycast.models.WeatherResponse
 
 sealed class Response {
     data object Loading : Response()

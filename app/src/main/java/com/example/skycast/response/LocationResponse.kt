@@ -1,4 +1,4 @@
-package com.example.skycast.Response
+package com.example.skycast.response
 
 
 sealed class LocationResponse<out T> {
