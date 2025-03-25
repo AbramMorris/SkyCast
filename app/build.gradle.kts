@@ -23,6 +23,7 @@ android {
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "API_KEY", properties.getProperty("API_KEY"))
+        buildConfigField("String","MAP_KEY",properties.getProperty("MAP_KEY"))
     }
 
     buildTypes {
@@ -99,6 +100,8 @@ dependencies {
     implementation ("com.google.android.gms:play-services-location:21.1.0")
     implementation("com.google.maps.android:maps-compose:6.4.1")
     implementation("com.google.maps.android:places-compose:0.1.3")
+    implementation("com.google.android.libraries.places:places:4.1.0")
+
 
 
 

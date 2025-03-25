@@ -22,6 +22,9 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.skycast.database.AppDatabase
+import com.example.skycast.database.LocalDataSource
+import com.example.skycast.database.LocationDao
 import com.example.skycast.remotes.WeatherApiServes
 import com.example.skycast.remotes.WeatherRemoteDataSourceImpl
 import com.example.skycast.repo.WeatherRepositoryImpl
@@ -49,7 +52,8 @@ class MainActivity : ComponentActivity() {
             MainNavigation()
             val apiService = WeatherApiServes.create()
             val remoteDataSource = WeatherRemoteDataSourceImpl(apiService)
-            val repository = WeatherRepositoryImpl(remoteDataSource)
+            val local = LocalDataSource(AppDatabase.getDatabase(this).locationDao())
+            val repository = WeatherRepositoryImpl(remoteDataSource,local)
             val viewModelFactory = WeatherViewModelFactory(repository)
             viewModel = ViewModelProvider(this, viewModelFactory)[WeatherViewModel::class.java]
         }

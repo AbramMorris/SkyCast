@@ -28,6 +28,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.example.skycast.uiI.screens.SettingsScreen
 import com.example.skycast.ui.theme.BlueLight
+import com.example.skycast.uiI.screens.MapWithMarkers
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -38,6 +39,7 @@ fun AppNavGraph(navController: NavHostController, viewModel: WeatherViewModel) {
         composable(ScreenRoute.Home.route) { HomeForecastScreen(navController, viewModel) }
         composable(ScreenRoute.Locations.route) { FavouriteLocationScreen(navController, viewModel) }
         composable(ScreenRoute.Setting.route) { SettingsScreen(navController, viewModel) }
+        composable("map_with_markers") { MapWithMarkers(viewModel) }
     }
 }
 @Composable

@@ -4,12 +4,14 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.skycast.database.SavedLocation
 import com.example.skycast.models.WeatherForecastResponse
 import com.example.skycast.models.WeatherResponse
 import com.example.skycast.repo.WeatherRepository
 import com.example.skycast.util.mapTemperatureUnit
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -32,7 +34,8 @@ class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
 
-
+    private val _savedLocations = MutableStateFlow<List<SavedLocation>>(emptyList())
+    val savedLocations: StateFlow<List<SavedLocation>> = _savedLocations.asStateFlow()
 
     fun fetchWeather( long :Double, lat :Double ,unit :String) {
         var newTemp =mapTemperatureUnit(unit)
@@ -59,17 +62,24 @@ class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() 
     }
 
 
-    fun convertTemperature(value: Double, from: String, to: String): String {
-        val temp = when (from.lowercase() to to.lowercase()) {
-            "celsius" to "kelvin" -> value + 273.15
-            "celsius" to "fahrenheit" -> (value * 9/5) + 32
-            "kelvin" to "celsius" -> value - 273.15
-            "kelvin" to "fahrenheit" -> (value - 273.15) * 9/5 + 32
-            "fahrenheit" to "celsius" -> (value - 32) * 5/9
-            "fahrenheit" to "kelvin" -> (value - 32) * 5/9 + 273.15
-            else -> throw IllegalArgumentException("Invalid conversion")
+    fun getFavLocations() {
+        viewModelScope.launch {
+            repository.getAllLocations().collectLatest { locations ->
+                _savedLocations.value = locations
+            }
         }
-        return String.format("%.2f", temp)
+    }
+
+    fun addLocation(location: SavedLocation) {
+        viewModelScope.launch {
+            repository.insertLocation(location)
+        }
+    }
+
+    fun removeLocation(location: SavedLocation) {
+        viewModelScope.launch {
+            repository.deleteLocation(location)
+        }
     }
 
 }
@@ -90,9 +100,4 @@ fun getDayNameFromDate(date: String): String {
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.getDefault())
     val localDate = LocalDate.parse(date, formatter)
     return localDate.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
-}
-enum class Temperature {
-    CELSIUS,
-    FAHRENHEIT,
-    KELVIN
 }

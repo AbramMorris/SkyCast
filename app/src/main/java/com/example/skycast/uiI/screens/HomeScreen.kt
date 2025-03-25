@@ -41,6 +41,8 @@ import com.example.skycast.models.WeatherDetailItem
 import com.example.skycast.models.WeatherForecastResponse
 import com.example.skycast.models.WeatherResponse
 import com.example.skycast.R
+import com.example.skycast.database.AppDatabase
+import com.example.skycast.database.LocalDataSource
 import com.example.skycast.remotes.WeatherApiServes
 import com.example.skycast.remotes.WeatherRemoteDataSourceImpl
 import com.example.skycast.repo.WeatherRepositoryImpl
@@ -58,7 +60,8 @@ import com.example.skycast.util.setUnitSymbol
 fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel, ) {
     val apiService = WeatherApiServes.create() // Initialize Retrofit API service
     val remoteDataSource = WeatherRemoteDataSourceImpl(apiService) // Create Remote Data Source
-    val repository = WeatherRepositoryImpl(remoteDataSource) // Create Repository
+    val local = LocalDataSource(AppDatabase.getDatabase(LocalContext.current).locationDao())
+    val repository = WeatherRepositoryImpl(remoteDataSource,local) // Create Repository
     val viewModelFactory = WeatherViewModelFactory(repository)
     val viewModel: WeatherViewModel = viewModel(factory = WeatherViewModelFactory( repository))
     val weatherState by viewModel.weatherState.collectAsState()
@@ -68,8 +71,6 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
     val key = "6d0017f68dd3859d46f1f479f8cac002"
     val context = LocalContext.current
     var locationHelper = LocationHelper(context)
-//    val sharedPref = remember { SharedPreferenceManager(context) }
-//    val temperatureUnit = remember { sharedPref.getTemperatureUnit() }
 
 
 
@@ -167,12 +168,6 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
                         color = Color.White,
                         modifier = Modifier.padding(top = 8.dp)
                     )
-//                    Text(
-//                        text = "Current Temperature: ${viewModel.displayedTemperature}",
-//                        fontSize = 18.sp,
-//                        fontWeight = FontWeight.Bold,
-//                        color = Color.White
-//                    )
 
                     // Weather Details Row
                     WeatherDetailsRow(weather)
@@ -238,11 +233,14 @@ fun WeatherDetailsRow(weather: WeatherResponse) {
             WeatherDetailItem(icon = R.drawable.humidity, value = "${weather.main.humidity}%", label = "Humidity")
             WeatherDetailItem(icon = R.drawable.wind, value = "${weather.wind.speed} km/h", label = "Wind")
             WeatherDetailItem(icon = R.drawable.pressure, value = "${weather.main.pressure} hPa", label = "Pressure")
+            WeatherDetailItem(icon = R.drawable.cloudy, value = "${weather.clouds} ", label = "cloud")
+
         }
     }
 }
 @Composable
 fun FutureModelViewHolder(forecast: WeatherForecastResponse.ForecastItem) {
+    var context = LocalContext.current
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -265,7 +263,7 @@ fun FutureModelViewHolder(forecast: WeatherForecastResponse.ForecastItem) {
             modifier = Modifier.size(50.dp)
         )
         Text(
-            text = "${forecast.main.temp}°C",
+            text = "${forecast.main.temp.toInt()} ${setUnitSymbol(getTemperatureUnit(context,"Temp")?:"C")}",
             color = Color.White,
             fontSize = 16.sp
         )
@@ -281,6 +279,7 @@ fun FutureModelViewHolder(forecast: WeatherForecastResponse.ForecastItem) {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun WeeklyForecast(forecastState: WeatherForecastResponse? ) {
+    val context = LocalContext.current
     forecastState?.let { forecast ->
         val dailyAverages = forecast.list
             .groupBy { it.dt_txt.substring(0, 10) } // Group by date (YYYY-MM-DD)
@@ -314,7 +313,8 @@ fun WeeklyForecast(forecastState: WeatherForecastResponse? ) {
                             , fontStyle =  androidx.compose.ui.text.font.FontStyle.Italic
                         , fontWeight = FontWeight.Bold
                     )
-                    Text("$avgTemp°C", color = Color.White)
+                    Text("$avgTemp ${setUnitSymbol(getTemperatureUnit(context,"Temp")?:"C")}", color = Color.White
+                    , fontSize = 20.sp)
 
                     Image(
                         painter = painterResource(id =

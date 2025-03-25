@@ -30,20 +30,20 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.skycast.viewmodel.WeatherViewModel
 import com.example.skycast.ui.theme.BlueLight
+import com.example.skycast.util.getTemperatureUnit
 import com.example.skycast.util.saveTemperatureUnit
 
 @Composable
 fun SettingsScreen( navController: NavController, viewModel: WeatherViewModel) {
     val context = LocalContext.current
 
-//    var sharedPref = remember { SharedPreferenceManager(context ,) }
+
     var selectedTemperature by remember { mutableStateOf("°C") }
-//    var temperatureUnit by remember { mutableStateOf(sharedPref.getTemperatureUnit()) }
-//    var selectedTemperature by remember { mutableStateOf("°C") }
+    selectedTemperature = getTemperatureUnit(context, "Temp").toString()
     var selectedWindSpeed by remember { mutableStateOf("m/s") }
     var selectedPressure by remember { mutableStateOf("mbar") }
     var selectedTheme by remember { mutableStateOf("System") }
-    var isNewDesignEnabled by remember { mutableStateOf(false) }
+
 
 
     Column(
