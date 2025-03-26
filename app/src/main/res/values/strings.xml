@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">SkyCast</string>
+    <string name="setting">Setting</string>
+    <string name="favourite_location">Favourite Location</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="weather_icon">Weather Icon</string>
+    <string name="no_description">No description</string>
+    <string name="today">Today</string>
+    <string name="weekly_forecast">Weekly Forecast</string>
 </resources>

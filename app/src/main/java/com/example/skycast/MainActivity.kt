@@ -1,61 +1,130 @@
 package com.example.skycast
 
+
+import android.content.pm.PackageManager
+import android.location.Location
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import com.airbnb.lottie.compose.*
-import com.example.skycast.ui.theme.*
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.example.skycast.database.AppDatabase
+import com.example.skycast.database.LocalDataSource
+import com.example.skycast.remotes.WeatherApiServes
+import com.example.skycast.remotes.WeatherRemoteDataSourceImpl
+import com.example.skycast.repo.WeatherRepositoryImpl
+import com.example.skycast.uiI.navigation.AppNavGraph
+import com.example.skycast.uiI.navigation.ScreenRoute
+import com.example.skycast.uiI.navigation.navBar
+import com.example.skycast.util.LocationHelper
+import com.example.skycast.util.REQUEST_LOCATION_PERMISSION
+import com.example.skycast.viewmodel.WeatherViewModel
+import com.example.skycast.viewmodel.WeatherViewModelFactory
 
 
 class MainActivity : ComponentActivity() {
+    lateinit var viewModel: WeatherViewModel
+    private lateinit var locationHelper : LocationHelper
+    private lateinit var locationState : MutableState<Location?>
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        locationHelper = LocationHelper(this)
+        locationState = mutableStateOf<Location?>(null)
+        enableEdgeToEdge()
         setContent {
-            SplashScreen()
+
+            MainNavigation()
+            val apiService = WeatherApiServes.create()
+            val remoteDataSource = WeatherRemoteDataSourceImpl(apiService)
+            val local = LocalDataSource(AppDatabase.getDatabase(this).locationDao())
+            val repository = WeatherRepositoryImpl(remoteDataSource,local)
+            val viewModelFactory = WeatherViewModelFactory(repository)
+            viewModel = ViewModelProvider(this, viewModelFactory)[WeatherViewModel::class.java]
+        }
+        if (!locationHelper.hasLocationPermissions()) {
+            locationHelper.requestLocationPermissions(this)
+        } else {
+            fetchLocation()
         }
     }
-}
-
-@Composable
-fun SplashScreen() {
-    val isDarkMode = MaterialTheme.colorScheme.background == BlueBlack
-    val backgroundColor = if (isDarkMode) BlueBlack else BlueLight
-
-    val backgroundLottie = rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.splashlottie))
-    val progress by animateFloatAsState(
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        )
-    )
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(backgroundColor),
-        contentAlignment = Alignment.Center
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
     ) {
-        LottieAnimation(
-            composition = backgroundLottie.value,
-            iterations = LottieConstants.IterateForever,
-            modifier = Modifier.fillMaxSize()
-        )
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_LOCATION_PERMISSION) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                fetchLocation()
+            } else {
+                Log.e("TAG", "MainActivity Permission denied by user.")
+            }
+        }
     }
+
+    override fun onStart() {
+        super.onStart()
+
+        if (locationHelper.hasLocationPermissions()) {
+            if (locationHelper.isLocationEnabled()) {
+                fetchLocation()
+            } else {
+                locationHelper.enableLocation()
+            }
+        } else {
+            locationHelper.requestLocationPermissions(this)
+        }
+    }
+    private fun fetchLocation() {
+        locationHelper.getFreshLocation { location ->
+            locationState.value = location
+        }
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    @Composable
+    fun MainNavigation() {
+
+        val navController = rememberNavController()
+
+        Scaffold(
+            modifier = Modifier
+                .fillMaxSize(),
+            contentWindowInsets = ScaffoldDefaults.contentWindowInsets
+            ,
+            bottomBar = {
+                val currentBackStackEntry = navController.currentBackStackEntryAsState()
+                val currentRoute = currentBackStackEntry.value?.destination?.route
+                if (currentRoute != ScreenRoute.Splash.route){
+                navBar(navController)
+                }
+            }
+        ) { paddingValues ->
+            Box(modifier = Modifier.padding(paddingValues)) {
+                AppNavGraph(navController = navController, viewModel = viewModel)
+            }
+        }
+    }
+
 }
 
-@Preview(showBackground = true)
-@Composable
-fun SplashScreenPreview() {
-    SplashScreen()
-}
+
+
+
