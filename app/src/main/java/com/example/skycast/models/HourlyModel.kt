@@ -1,4 +1,4 @@
-package com.example.skycast
+package com.example.skycast.models
 
 class HourlyModel(
 

@@ -20,7 +20,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.skycast.R
-import com.example.skycast.ScreenRoute
+import com.example.skycast.uiI.navigation.ScreenRoute
 import com.example.skycast.ui.theme.BlueBlack
 import com.example.skycast.ui.theme.BlueLight
 import kotlinx.coroutines.delay

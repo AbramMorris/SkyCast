@@ -8,7 +8,9 @@ import com.example.skycast.database.SavedLocation
 import com.example.skycast.models.WeatherForecastResponse
 import com.example.skycast.models.WeatherResponse
 import com.example.skycast.repo.WeatherRepository
+import com.example.skycast.response.Response
 import com.example.skycast.util.mapTemperatureUnit
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,6 +22,8 @@ import java.time.format.TextStyle
 import java.util.Locale
 
 class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() {
+    private val mutableFavCity = MutableStateFlow<Response>(Response.Loading)
+    val cityName: StateFlow<Response> = mutableFavCity.asStateFlow()
 
 
     private val _weatherState = MutableStateFlow<WeatherResponse?>(null)
@@ -35,7 +39,7 @@ class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() 
     val errorMessage: StateFlow<String?> = _errorMessage
 
     private val _savedLocations = MutableStateFlow<List<SavedLocation>>(emptyList())
-    val savedLocations: StateFlow<List<SavedLocation>> = _savedLocations.asStateFlow()
+//    val savedLocations: StateFlow<List<SavedLocation>> = _savedLocations.asStateFlow()
 
     fun fetchWeather( long :Double, lat :Double ,unit :String) {
         var newTemp =mapTemperatureUnit(unit)
@@ -61,18 +65,26 @@ class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() 
         }
     }
 
+    private var _selectedLocation = MutableStateFlow<SavedLocation?>(null)
+    var selectedLocation: StateFlow<SavedLocation?> = _selectedLocation
 
-    fun getFavLocations() {
-        viewModelScope.launch {
-            repository.getAllLocations().collectLatest { locations ->
-                _savedLocations.value = locations
-            }
-        }
+    val savedLocations: Flow<List<SavedLocation>> = repository.getAllLocations()
+
+    fun updateSelectedLocation(location: SavedLocation) {
+        _selectedLocation.value = location
     }
 
     fun addLocation(location: SavedLocation) {
         viewModelScope.launch {
             repository.insertLocation(location)
+        }
+    }
+
+    fun getFavLocations() {
+        viewModelScope.launch {
+            repository.getAllLocations().collectLatest { locations ->
+                _savedLocations.value = locations.sortedBy { it.name }
+            }
         }
     }
 

@@ -99,7 +99,7 @@ dependencies {
     implementation("com.exyte:animated-navigation-bar:1.0.0")
     implementation ("com.google.android.gms:play-services-location:21.1.0")
     implementation("com.google.maps.android:maps-compose:6.4.1")
-    implementation("com.google.maps.android:places-compose:0.1.3")
+    implementation("com.google.maps.android:places-compose:0.1.2")
     implementation("com.google.android.libraries.places:places:4.1.0")
 
 

@@ -1,6 +1,7 @@
 package com.example.skycast.database
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 class LocalDataSource(private val locationDao: LocationDao) {
 

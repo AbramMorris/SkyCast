@@ -9,7 +9,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.skycast.ScreenRoute
 import com.example.skycast.uiI.screens.HomeForecastScreen
 import com.example.skycast.uiI.screens.FavouriteLocationScreen
 import com.example.skycast.uiI.screens.SplashScreen
@@ -28,7 +27,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.example.skycast.uiI.screens.SettingsScreen
 import com.example.skycast.ui.theme.BlueLight
-import com.example.skycast.uiI.screens.MapWithMarkers
+import com.example.skycast.uiI.screens.MapSelectionScreen
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -39,7 +38,7 @@ fun AppNavGraph(navController: NavHostController, viewModel: WeatherViewModel) {
         composable(ScreenRoute.Home.route) { HomeForecastScreen(navController, viewModel) }
         composable(ScreenRoute.Locations.route) { FavouriteLocationScreen(navController, viewModel) }
         composable(ScreenRoute.Setting.route) { SettingsScreen(navController, viewModel) }
-        composable("map_with_markers") { MapWithMarkers(viewModel) }
+        composable("map_with_markers") { MapSelectionScreen( viewModel, navController) }
     }
 }
 @Composable

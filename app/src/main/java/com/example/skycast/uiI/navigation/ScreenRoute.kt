@@ -1,4 +1,4 @@
-package com.example.skycast
+package com.example.skycast.uiI.navigation
 
 sealed class ScreenRoute(val route: String) {
     object Home : ScreenRoute("home")

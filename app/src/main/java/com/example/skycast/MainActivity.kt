@@ -24,11 +24,11 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.skycast.database.AppDatabase
 import com.example.skycast.database.LocalDataSource
-import com.example.skycast.database.LocationDao
 import com.example.skycast.remotes.WeatherApiServes
 import com.example.skycast.remotes.WeatherRemoteDataSourceImpl
 import com.example.skycast.repo.WeatherRepositoryImpl
 import com.example.skycast.uiI.navigation.AppNavGraph
+import com.example.skycast.uiI.navigation.ScreenRoute
 import com.example.skycast.uiI.navigation.navBar
 import com.example.skycast.util.LocationHelper
 import com.example.skycast.util.REQUEST_LOCATION_PERMISSION
