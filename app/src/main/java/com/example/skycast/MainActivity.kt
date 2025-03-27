@@ -32,8 +32,10 @@ import com.example.skycast.uiI.navigation.ScreenRoute
 import com.example.skycast.uiI.navigation.navBar
 import com.example.skycast.util.LocationHelper
 import com.example.skycast.util.REQUEST_LOCATION_PERMISSION
+import com.example.skycast.util.loadLanguagePreference
 import com.example.skycast.viewmodel.WeatherViewModel
 import com.example.skycast.viewmodel.WeatherViewModelFactory
+import java.util.Locale
 
 
 class MainActivity : ComponentActivity() {
@@ -47,6 +49,8 @@ class MainActivity : ComponentActivity() {
         locationHelper = LocationHelper(this)
         locationState = mutableStateOf<Location?>(null)
         enableEdgeToEdge()
+        val languageCode = loadLanguagePreference(this)
+        applyLanguage(languageCode)
         setContent {
 
             MainNavigation()
@@ -123,8 +127,15 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun applyLanguage(languageCode: String) {
+        val locale = Locale(languageCode)
+        Locale.setDefault(locale)
+
+        val config = resources.configuration
+        config.setLocale(locale)
+        resources.updateConfiguration(config, resources.displayMetrics)
+    }
+
 }
-
-
 
 

@@ -24,14 +24,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.skycast.R
 import com.example.skycast.viewmodel.WeatherViewModel
 import com.example.skycast.ui.theme.BlueLight
 import com.example.skycast.util.getTemperatureUnit
+import com.example.skycast.util.restartApp
+import com.example.skycast.util.saveLanguagePreference
 import com.example.skycast.util.saveTemperatureUnit
+import com.example.skycast.util.setAppLocale
+import com.example.skycast.util.setLanguage
 
 @Composable
 fun SettingsScreen( navController: NavController, viewModel: WeatherViewModel) {
@@ -41,31 +47,36 @@ fun SettingsScreen( navController: NavController, viewModel: WeatherViewModel) {
     var selectedTemperature by remember { mutableStateOf("°C") }
     selectedTemperature = getTemperatureUnit(context, "Temp").toString()
     var selectedWindSpeed by remember { mutableStateOf("m/s") }
-    var selectedPressure by remember { mutableStateOf("mbar") }
     var selectedTheme by remember { mutableStateOf("System") }
+    var selectedLanguage by remember { mutableStateOf("en") }
+    selectedLanguage = getTemperatureUnit(context, "Lang").toString()
+
 
 
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background( brush = Brush.verticalGradient(
-                colors = listOf(
-                    Color(android.graphics.Color.parseColor("#022a9a")),
-                    Color(android.graphics.Color.parseColor("#5381ff"))
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(android.graphics.Color.parseColor("#022a9a")),
+                        Color(android.graphics.Color.parseColor("#5381ff"))
+                    )
                 )
-            ))
+            )
             .padding(16.dp)
     ) {
         // Top bar
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(top = 20.dp)
         ) {
 
             Text(
-                text = "Settings",
+                text = stringResource(R.string.settings),
                 fontSize = 22.sp,
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
@@ -77,8 +88,11 @@ fun SettingsScreen( navController: NavController, viewModel: WeatherViewModel) {
 
         // Temperature
         SettingSection(
-            title = "Temperature",
-            options = listOf("°C", "°F", "K"),
+            title = stringResource(R.string.temperature),
+            options = listOf(stringResource(R.string.c), stringResource(R.string.f), stringResource(
+                R.string.k
+            )
+            ),
             selectedOption = selectedTemperature
         ) { newSelection ->
             selectedTemperature = newSelection
@@ -87,17 +101,36 @@ fun SettingsScreen( navController: NavController, viewModel: WeatherViewModel) {
         }
 
         // Wind Speed
-        SettingSection(title = "Wind speed", options = listOf("meter/sec", "miles/hour"), selectedOption = selectedWindSpeed) {
-            selectedWindSpeed = it
+        SettingSection(title = stringResource(R.string.wind_speed), options = listOf("meter/sec", "miles/hour"), selectedOption = selectedWindSpeed) {
+            newSelection ->
+            selectedWindSpeed = newSelection
+            saveTemperatureUnit(context,"Wind",newSelection)
+
         }
 
-        // Language
-        SettingSection(title = "language", options = listOf("Arabic", "English"), selectedOption = selectedPressure) {
-            selectedPressure = it
+//         Language
+        SettingSection(
+            title = stringResource(R.string.language),
+            options = listOf(stringResource(R.string.arabic), stringResource(R.string.english)),
+            selectedOption = selectedLanguage
+        ) { selectedOption ->
+            selectedLanguage = selectedOption
+            Log.d("save","new selection $selectedLanguage")
+            saveTemperatureUnit(context,"Lang",selectedLanguage)
+            if (selectedLanguage == "English") {
+                saveLanguagePreference(context, "en")
+            } else if( selectedLanguage == "Arabic"){
+
+                saveLanguagePreference(context, "ar")
+            }
+            restartApp(context)
         }
+
 
         // Location
-        SettingSection(title = "location", options = listOf("GPS", "Map"), selectedOption = selectedTheme) {
+        SettingSection(title = stringResource(R.string.location), options = listOf(stringResource(R.string.gps),
+            stringResource(R.string.map)
+        ), selectedOption = selectedTheme) {
             selectedTheme = it
         }
 
@@ -123,7 +156,9 @@ fun SettingSection(title: String, options: List<String>, selectedOption: String,
                         contentColor = if (option == selectedOption) Color.White else Color.Black
                     ),
                     shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.weight(1f).padding(horizontal = 4.dp)
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 4.dp)
                 ) {
                     Text(text = option)
                 }

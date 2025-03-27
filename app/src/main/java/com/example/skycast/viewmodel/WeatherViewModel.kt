@@ -10,6 +10,7 @@ import com.example.skycast.models.WeatherResponse
 import com.example.skycast.repo.WeatherRepository
 import com.example.skycast.response.Response
 import com.example.skycast.util.mapTemperatureUnit
+import com.example.skycast.util.setLanguage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -39,13 +40,15 @@ class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() 
     val errorMessage: StateFlow<String?> = _errorMessage
 
     private val _savedLocations = MutableStateFlow<List<SavedLocation>>(emptyList())
-//    val savedLocations: StateFlow<List<SavedLocation>> = _savedLocations.asStateFlow()
 
-    fun fetchWeather( long :Double, lat :Double ,unit :String) {
+
+
+    fun fetchWeather( long :Double, lat :Double, lang: String ,unit :String) {
         var newTemp =mapTemperatureUnit(unit)
+        var newLang = setLanguage(lang)
         viewModelScope.launch {
             _loading.value = true
-            repository.getCurrentWeather( long , lat,newTemp).collectLatest { result ->
+            repository.getCurrentWeather( long , lat , newLang ,newTemp).collectLatest { result ->
                 result.onSuccess { _weatherState.value = it }
                 result.onFailure { _errorMessage.value = it.message }
                 _loading.value = false
@@ -53,11 +56,12 @@ class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() 
         }
     }
 
-    fun fetchWeatherForecast(lat: Double, lon: Double ,unit: String) {
+    fun fetchWeatherForecast(lat: Double, lon: Double, lang: String ,unit: String) {
         var newTemp =mapTemperatureUnit(unit)
+        var newLang = setLanguage(lang)
         viewModelScope.launch {
             _loading.value = true
-            repository.getWeatherForecast(lat, lon,newTemp).collectLatest { result ->
+            repository.getWeatherForecast(lat, lon, newLang ,newTemp).collectLatest { result ->
                 result.onSuccess { _forecastState.value = it }
                 result.onFailure { _errorMessage.value = it.message }
                 _loading.value = false

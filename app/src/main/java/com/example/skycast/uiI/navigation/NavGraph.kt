@@ -25,6 +25,8 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.res.stringResource
+import com.example.skycast.R
 import com.example.skycast.uiI.screens.SettingsScreen
 import com.example.skycast.ui.theme.BlueLight
 import com.example.skycast.uiI.screens.MapSelectionScreen
@@ -38,29 +40,30 @@ fun AppNavGraph(navController: NavHostController, viewModel: WeatherViewModel) {
         composable(ScreenRoute.Home.route) { HomeForecastScreen(navController, viewModel) }
         composable(ScreenRoute.Locations.route) { FavouriteLocationScreen(navController, viewModel) }
         composable(ScreenRoute.Setting.route) { SettingsScreen(navController, viewModel) }
-        composable("map_with_markers") { MapSelectionScreen( viewModel, navController) }
+        composable(ScreenRoute.MapWithMarkers.route) { MapSelectionScreen( viewModel, navController) }
     }
 }
+
 @Composable
 fun navBar(navController: NavHostController){
     val navigationItems = listOf(
         NavigationItem(
-            title = ("home"),
+            title = (stringResource(R.string.home)),
             icon = Icons.Default.Home,
             route = ScreenRoute.Home
         ),
         NavigationItem(
-            title = ("favourite"),
+            title = (stringResource(R.string.favourite)),
             icon = Icons.Default.Favorite,
             route = ScreenRoute.Locations
         ),
         NavigationItem(
-            title = ("alert"),
+            title = (stringResource(R.string.alert)),
             icon = Icons.Default.Notifications,
             route = ScreenRoute.Splash
         ),
         NavigationItem(
-            title = ("setting"),
+            title = (stringResource(R.string.setting)),
             icon = Icons.Default.Settings,
             route = ScreenRoute.Setting
         )
@@ -105,56 +108,3 @@ data class NavigationItem(
     val icon: ImageVector,
     val route: ScreenRoute
 )
-
-
-
-
-//
-//@Composable
-//fun BottomNavigationBar(navController: NavController, currentRoute: String?) {
-//    val navigationBarItems = listOf(
-//        NavigationItem(ScreenRoute.Home.route, NavigationBarItems.HOME.icon),
-//        NavigationItem(ScreenRoute.Locations.route,NavigationBarItems.FAV.icon),
-////        NavigationItem("profile", NavigationBarItems.PROFILE.icon)
-//    )
-//
-////    val selectedIndex = navigationBarItems.indexOfFirst { it.route == currentRoute }.takeIf { it >= 0 } ?: 0
-//    val selectedIndex = remember { mutableStateOf(0) }
-//     val list = listOf(R.drawable.sunny,R.drawable.cloudy,R.drawable.rain,R.drawable.storm)
-//    AnimatedNavigationBar(
-//        modifier = Modifier.background(Color.DarkGray),
-//        selectedIndex = selectedIndex.value,
-//        cornerRadius = shapeCornerRadius( 34.dp),
-//        ballAnimation = Parabolic(tween(300)),
-//        indentAnimation = Height(tween(300)),
-//        ballColor = Color.White,
-//        barColor = Color.White,
-//    ) {
-//        navigationBarItems.forEachIndexed { index, item ->
-//
-//            Box(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .noRippleClickable { navController.navigate(item.route) },
-//            ) {
-//                Icon(
-//                    painter = painterResource(item.icon),
-//                    contentDescription = item.route,
-//                    modifier = Modifier.size(30.dp)
-//
-//                )
-//            }
-//        }
-//    }
-//}
-//
-//data class NavigationItem(val route: String, val icon: Int)
-//
-//enum class NavigationBarItems(val icon : Int){
-//    HOME(icon = R.drawable.cloudy_sunny),
-//    LOCATION(icon = R.drawable.wind),
-//    FAV(icon = R.drawable.cloudy),
-//    PROFILE(icon = R.drawable.windy)
-//}
-//
-//

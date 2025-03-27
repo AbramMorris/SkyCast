@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SkyCast</string>
+    <string name="setting">الاعدادات</string>
+    <string name="favourite_location">الاماكن المفضلة</string>
+    <string name="unknown_error">خطا غير معروف</string>
+    <string name="today">اليوم</string>
+    <string name="weekly_forecast">"التوقعات الأسبوعية "</string>
+    <string name="language">اللغة</string>
+    <string name="arabic">العربية</string>
+    <string name="english">الانجليزية</string>
+    <string name="temperature">المناخ</string>
+    <string name="c">°س</string>
+    <string name="f">°ف</string>
+    <string name="k">ك</string>
+    <string name="gps">"نظام تحديد المواقع "</string>
+    <string name="map">الخريطة</string>
+    <string name="wind_speed">"سرعة الرياح "</string>
+    <string name="location">موقع</string>
+    <string name="settings">الاعدادات</string>
+    <string name="humidity">الرطوبة</string>
+    <string name="wind">الرياح</string>
+    <string name="pressure">الضغط</string>
+    <string name="cloud">السحب</string>
+    <string name="hpa">%1$s هكتوباسكال</string>
+    <string name="home">الرئيسية</string>
+    <string name="favourite">المفضلة</string>
+    <string name="alert">التنبيهات</string>
+</resources>
