@@ -2,9 +2,11 @@ package com.example.skycast.util
 
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.location.Geocoder
 import android.util.Log
+import com.example.skycast.R
+import com.example.skycast.data.enums.LanguageDisplay
+import com.example.skycast.data.enums.TemperatureUnit
 import com.google.android.gms.maps.model.LatLng
 import java.util.Locale
 
@@ -22,10 +24,13 @@ fun saveTemperatureUnit(context : Context, key :String , value: String) {
 
 fun mapTemperatureUnit(temperature: String): String {
     return when(temperature){
-        "°C" -> "metric"
-        "°F" -> "imperial"
-        "K" -> "standard"
-        else -> "metric"
+        TemperatureUnit.CELSIUS.displayName  -> TemperatureUnit.CELSIUS.code
+        TemperatureUnit.FAHRENHEIT.displayName -> TemperatureUnit.FAHRENHEIT.code
+        TemperatureUnit.KELVIN.displayName -> TemperatureUnit.KELVIN.code
+        TemperatureUnit.CELSIUS.arabDisplayName  -> TemperatureUnit.CELSIUS.code
+        TemperatureUnit.FAHRENHEIT.arabDisplayName -> TemperatureUnit.FAHRENHEIT.code
+        TemperatureUnit.KELVIN.arabDisplayName -> TemperatureUnit.KELVIN.code
+        else -> TemperatureUnit.CELSIUS.code
     }
 }
 
@@ -55,42 +60,32 @@ fun convertMetersPerSecondToMilesPerHour(speedInMetersPerSecond: Double): Double
 }
 
 fun setLanguage(currentLang: String): String {
-    return if (currentLang == "Arabic") "ar" else "en"
+    return if (currentLang == LanguageDisplay.ARABIC.displayName) LanguageDisplay.ARABIC.code else LanguageDisplay.ENGLISH.code
 }
 
 
 
-fun formatNumberBasedOnLanguage(number: String, language: String): String {
+fun formatNumberBasedOnLanguage(number: String): String {
     val arabicDigits = arrayOf('٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩')
-    return if (language =="Arabic") {
+    return if (Locale.getDefault().language == LanguageDisplay.ARABIC.code) {
+        Log.d("name", "formatNumberBasedOnLanguage: ${Locale.getDefault().language}")
         number.map { if (it.isDigit()) arabicDigits[it.digitToInt()] else it }.joinToString("")
     } else {
         number
     }
 }
 
+
 fun formatTemperatureUnitBasedOnLanguage(unit: String, language: String): String {
-    if (language == "Arabic") {
+    if (language == LanguageDisplay.ARABIC.displayName) {
         return when (unit) {
-            "°C" -> "°س"
-            "°F" -> "°ف"
-            "°K" -> "°ك"
+            TemperatureUnit.CELSIUS.arabDisplayName -> "°س"
+            TemperatureUnit.FAHRENHEIT.arabDisplayName-> "°ف"
+            TemperatureUnit.KELVIN.arabDisplayName -> "°ك"
             else -> "°س"
         }
     }
     return unit
-}
-fun setAppLocale(context: Context, languageCode: String) {
-    val locale = Locale(languageCode)
-    Locale.setDefault(locale)
-
-    val config = context.resources.configuration
-    config.setLocale(locale)
-
-    context.resources.updateConfiguration(config, context.resources.displayMetrics)
-
-    // Save the language preference
-    saveLanguagePreference(context, languageCode)
 }
 
 fun restartApp(context: Context) {
@@ -101,7 +96,6 @@ fun restartApp(context: Context) {
 
 fun loadLanguagePreference(context: Context): String {
     val sharedPreferences = context.getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
-    Log.d("loadLanguagePreference", "loadLanguagePreference: ${sharedPreferences.getString("LANGUAGE", "en")}")
     return sharedPreferences.getString("LANGUAGE", "en") ?: "en"
 }
 
@@ -110,19 +104,13 @@ fun saveLanguagePreference(context: Context, languageCode: String) {
     sharedPreferences.edit().putString("LANGUAGE", languageCode).apply()
 }
 
-enum class Languages(val displayName: String, val code: String) {
-    ENGLISH("English", "en"),
-    SPANISH("Español", "es"),
-    FRENCH("Français", "fr"),
-    GERMAN("Deutsch", "de"),
-    ITALIAN("Italiano", "it"),
-    CHINESE("中文", "zh"),
-    JAPANESE("日本語", "ja"),
-    ARABIC("العربية", "ar"),
-    HINDI("हिन्दी", "hi"),
-    PORTUGUESE("Português", "pt");
-    companion object {
-        fun fromCode(code: String): Languages? = Languages.entries.find { it.code == code }
-        fun fromDisplayName(displayName: String): Languages? = Languages.entries.find { it.displayName == displayName }
-    }
+fun getWindSpeedUnit(tempUnit: String): String {
+    return if (tempUnit == "imperial") "mph" else "m/s"
 }
+
+
+enum class WindSpeedUnit(val displayName: String, val code: String) {
+    METERS_PER_SECOND("m/s", "metric"),
+    MILES_PER_HOUR("mph", "imperial");
+}
+

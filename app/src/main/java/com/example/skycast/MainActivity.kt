@@ -22,14 +22,14 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.skycast.database.AppDatabase
-import com.example.skycast.database.LocalDataSource
-import com.example.skycast.remotes.WeatherApiServes
-import com.example.skycast.remotes.WeatherRemoteDataSourceImpl
-import com.example.skycast.repo.WeatherRepositoryImpl
-import com.example.skycast.uiI.navigation.AppNavGraph
-import com.example.skycast.uiI.navigation.ScreenRoute
-import com.example.skycast.uiI.navigation.navBar
+import com.example.skycast.data.database.AppDatabase
+import com.example.skycast.data.database.LocalDataSource
+import com.example.skycast.data.remotes.WeatherApiServes
+import com.example.skycast.data.remotes.WeatherRemoteDataSourceImpl
+import com.example.skycast.data.repo.WeatherRepositoryImpl
+import com.example.skycast.ui.navigation.AppNavGraph
+import com.example.skycast.ui.navigation.ScreenRoute
+import com.example.skycast.ui.navigation.navBar
 import com.example.skycast.util.LocationHelper
 import com.example.skycast.util.REQUEST_LOCATION_PERMISSION
 import com.example.skycast.util.loadLanguagePreference
@@ -49,8 +49,9 @@ class MainActivity : ComponentActivity() {
         locationHelper = LocationHelper(this)
         locationState = mutableStateOf<Location?>(null)
         enableEdgeToEdge()
-        val languageCode = loadLanguagePreference(this)
-        applyLanguage(languageCode)
+
+        applyLanguage(loadLanguagePreference(this))
+        Log.d("loadLanguagePreference", "onCreate: ${loadLanguagePreference(this)}")
         setContent {
 
             MainNavigation()
@@ -137,5 +138,3 @@ class MainActivity : ComponentActivity() {
     }
 
 }
-
-
