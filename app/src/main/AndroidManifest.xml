@@ -4,6 +4,11 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android. permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
+<!--    <uses-permission android:name="android.permission.SET_ALARM"/>-->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+
 
     <application
         android:allowBackup="true"
@@ -29,6 +34,23 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCWWYJtCejwVw1rfb7WjiMYTc23XtQF2SQ" />
+        <receiver
+            android:name=".data.alarm.AlarmReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action
+                    android:name="com.example.skycast.ALARM_ACTION" />
+            </intent-filter>
+        </receiver>
+        <service
+            android:name=".services.AlarmService"
+            android:enabled="true"
+            android:foregroundServiceType="mediaPlayback"
+            android:exported="false"
+            android:permission="android.permission.FOREGROUND_SERVICE"
+            tools:ignore="ForegroundServicePermission" />
+
+
     </application>
 
 </manifest>

@@ -22,17 +22,21 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.skycast.database.AppDatabase
-import com.example.skycast.database.LocalDataSource
-import com.example.skycast.remotes.WeatherApiServes
-import com.example.skycast.remotes.WeatherRemoteDataSourceImpl
-import com.example.skycast.repo.WeatherRepositoryImpl
-import com.example.skycast.uiI.navigation.AppNavGraph
-import com.example.skycast.uiI.navigation.ScreenRoute
-import com.example.skycast.uiI.navigation.navBar
+import com.example.skycast.data.database.AlarmDataBase.AlarmDatabase
+import com.example.skycast.data.database.AlarmDataBase.AlarmLocalDataSource
+import com.example.skycast.data.database.FavDataBase.AppDatabase
+import com.example.skycast.data.database.FavDataBase.LocalDataSource
+import com.example.skycast.data.remotes.WeatherApiServes
+import com.example.skycast.data.remotes.WeatherRemoteDataSourceImpl
+import com.example.skycast.data.repo.WeatherRepositoryImpl
+import com.example.skycast.ui.navigation.AppNavGraph
+import com.example.skycast.ui.navigation.ScreenRoute
+import com.example.skycast.ui.navigation.navBar
 import com.example.skycast.util.LocationHelper
 import com.example.skycast.util.REQUEST_LOCATION_PERMISSION
 import com.example.skycast.util.loadLanguagePreference
+import com.example.skycast.viewmodel.AlarmViewModel
+import com.example.skycast.viewmodel.AlertViewModelFactory
 import com.example.skycast.viewmodel.WeatherViewModel
 import com.example.skycast.viewmodel.WeatherViewModelFactory
 import java.util.Locale
@@ -40,6 +44,7 @@ import java.util.Locale
 
 class MainActivity : ComponentActivity() {
     lateinit var viewModel: WeatherViewModel
+    lateinit var alarmViewModel: AlarmViewModel
     private lateinit var locationHelper : LocationHelper
     private lateinit var locationState : MutableState<Location?>
 
@@ -49,8 +54,9 @@ class MainActivity : ComponentActivity() {
         locationHelper = LocationHelper(this)
         locationState = mutableStateOf<Location?>(null)
         enableEdgeToEdge()
-        val languageCode = loadLanguagePreference(this)
-        applyLanguage(languageCode)
+
+        applyLanguage(loadLanguagePreference(this))
+        Log.d("loadLanguagePreference", "onCreate: ${loadLanguagePreference(this)}")
         setContent {
 
             MainNavigation()
@@ -58,8 +64,12 @@ class MainActivity : ComponentActivity() {
             val remoteDataSource = WeatherRemoteDataSourceImpl(apiService)
             val local = LocalDataSource(AppDatabase.getDatabase(this).locationDao())
             val repository = WeatherRepositoryImpl(remoteDataSource,local)
+            val alertLocalDataSource = AlarmLocalDataSource(AlarmDatabase.getDatabase(this).alarmDao())
+            val alarmRepository = com.example.skycast.data.repo.AlarmRepoImp(alertLocalDataSource)
             val viewModelFactory = WeatherViewModelFactory(repository)
+            val alarmViewModelFactory = AlertViewModelFactory(alarmRepository)
             viewModel = ViewModelProvider(this, viewModelFactory)[WeatherViewModel::class.java]
+            alarmViewModel = ViewModelProvider(this,alarmViewModelFactory)[AlarmViewModel::class.java]
         }
         if (!locationHelper.hasLocationPermissions()) {
             locationHelper.requestLocationPermissions(this)
@@ -122,7 +132,7 @@ class MainActivity : ComponentActivity() {
             }
         ) { paddingValues ->
             Box(modifier = Modifier.padding(paddingValues)) {
-                AppNavGraph(navController = navController, viewModel = viewModel)
+                AppNavGraph(navController = navController, viewModel = viewModel , alarmViewModel = alarmViewModel)
             }
         }
     }
@@ -137,5 +147,3 @@ class MainActivity : ComponentActivity() {
     }
 
 }
-
-

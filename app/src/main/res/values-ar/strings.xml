@@ -26,4 +26,11 @@
     <string name="home">الرئيسية</string>
     <string name="favourite">المفضلة</string>
     <string name="alert">التنبيهات</string>
+    <string name="location_deleted">تم حذف الموقع</string>
+    <string name="undo">تراجع</string>
+    <string name="delete">حذف</string>
+    <string name="location_icon">أيقونة الموقع</string>
+    <string name="unknown_location">موقع غير معروف</string>
+    <string name="save_location">حفظ الموقع</string>
+
 </resources>
