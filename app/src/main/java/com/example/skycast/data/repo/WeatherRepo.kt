@@ -1,6 +1,6 @@
 package com.example.skycast.data.repo
 
-import com.example.skycast.data.database.LocalDataSource
+import com.example.skycast.data.database.FavDataBase.LocalDataSource
 import com.example.skycast.data.models.SavedLocation
 import com.example.skycast.data.models.WeatherForecastResponse
 import com.example.skycast.data.models.WeatherResponse

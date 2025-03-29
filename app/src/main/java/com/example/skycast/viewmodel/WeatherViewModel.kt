@@ -51,6 +51,8 @@ class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() 
     private val mutableMessage = MutableSharedFlow<String>()
     val message: SharedFlow<String> = mutableMessage.asSharedFlow()
 
+    val isLoading = MutableStateFlow(false)
+
 
 
     fun fetchWeather( long :Double, lat :Double, lang: String ,unit :String)  {
@@ -68,11 +70,14 @@ class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() 
 
     fun fetchWeatherForecast(lat: Double, lon: Double, lang: String ,unit: String) {
         var newTemp =mapTemperatureUnit(unit)
+        Log.d("unit", "fetchWeatherForecast: $newTemp")
         var newLang = setLanguage(lang)
         viewModelScope.launch {
             _loading.value = true
-            repository.getWeatherForecast(lat, lon, newLang ,newTemp).collectLatest { result ->
-                result.onSuccess { _forecastState.value = it }
+            repository.getWeatherForecast(lat, lon, newTemp ,newLang).collectLatest { result ->
+                result.onSuccess { _forecastState.value = it
+                Log.d("forecast", "fetchWeatherForecast: ${it.list.get(0).main.temp}")
+                }
                 result.onFailure { _errorMessage.value = it.message }
                 _loading.value = false
             }
@@ -123,6 +128,7 @@ class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() 
         }
 
     }
+
 
 
 }
