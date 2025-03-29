@@ -1,4 +1,4 @@
-package com.example.skycast.data.database
+package com.example.skycast.data.database.FavDataBase
 
 import android.content.Context
 import androidx.room.Database
@@ -30,3 +30,4 @@ abstract class AppDatabase : RoomDatabase() {
         }
     }
 }
+

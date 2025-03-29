@@ -33,11 +33,12 @@ import com.example.skycast.ui.screens.SettingsScreen
 import com.example.skycast.ui.theme.BlueLight
 import com.example.skycast.ui.screens.DetailsScreen
 import com.example.skycast.ui.screens.MapSelectionScreen
+import com.example.skycast.viewmodel.AlarmViewModel
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun AppNavGraph(navController: NavHostController, viewModel: WeatherViewModel) {
+fun AppNavGraph(navController: NavHostController, viewModel: WeatherViewModel, alarmViewModel: AlarmViewModel) {
     NavHost(navController = navController, startDestination = ScreenRoute.Splash.route) {
         composable(ScreenRoute.Splash.route) { SplashScreen(navController) }
         composable(ScreenRoute.Home.route) { HomeForecastScreen(navController, viewModel) }
@@ -47,18 +48,24 @@ fun AppNavGraph(navController: NavHostController, viewModel: WeatherViewModel) {
         composable(ScreenRoute.Details.route) { DetailsScreen(navController, 0.0, 0.0, viewModel) }
         composable(
             route = "${ScreenRoute.Details.route}/{latitude}/{longitude}",
-            arguments = listOf(
-                navArgument("latitude") { type = NavType.StringType },
-                navArgument("longitude") { type = NavType.StringType }
-            )) { backStackEntry ->
+            arguments = listOf(navArgument("latitude") { type = NavType.StringType }, navArgument("longitude") { type = NavType.StringType }))
+        { backStackEntry ->
             val latitude = backStackEntry.arguments?.getString("latitude")?.toDoubleOrNull()
             val longitude = backStackEntry.arguments?.getString("longitude")?.toDoubleOrNull()
-
             if (latitude != null && longitude != null) {
                 DetailsScreen(
                     navController = navController, latitude = latitude, longitude = longitude, viewModel = viewModel
                 )
             }
+        }
+        composable(ScreenRoute.Alarm.route) {
+            com.example.skycast.ui.screens.AlarmScreen( navController,alarmViewModel)
+        }
+        composable(ScreenRoute.AlarmBottons.route) {
+            com.example.skycast.ui.screens.AlarmScreenUI( navController,alarmViewModel)
+        }
+        composable(ScreenRoute.AlarmMap.route) {
+            com.example.skycast.ui.screens.AlarmMapScreen(viewModel, alarmViewModel, navController)
         }
     }
 }
@@ -79,7 +86,7 @@ fun navBar(navController: NavHostController){
         NavigationItem(
             title = (stringResource(R.string.alert)),
             icon = Icons.Default.Notifications,
-            route = ScreenRoute.Splash
+            route = ScreenRoute.Alarm
         ),
         NavigationItem(
             title = (stringResource(R.string.setting)),

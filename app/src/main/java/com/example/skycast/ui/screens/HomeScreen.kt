@@ -41,8 +41,8 @@ import com.example.skycast.data.models.WeatherDetailItem
 import com.example.skycast.data.models.WeatherForecastResponse
 import com.example.skycast.data.models.WeatherResponse
 import com.example.skycast.R
-import com.example.skycast.data.database.AppDatabase
-import com.example.skycast.data.database.LocalDataSource
+import com.example.skycast.data.database.FavDataBase.AppDatabase
+import com.example.skycast.data.database.FavDataBase.LocalDataSource
 import com.example.skycast.data.remotes.WeatherApiServes
 import com.example.skycast.data.remotes.WeatherRemoteDataSourceImpl
 import com.example.skycast.data.repo.WeatherRepositoryImpl

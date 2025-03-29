@@ -1,4 +1,4 @@
-package com.example.skycast.data.database
+package com.example.skycast.data.database.FavDataBase
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -18,4 +18,5 @@ interface LocationDao {
 
     @Delete
     suspend fun deleteLocation(location: SavedLocation)
+
 }

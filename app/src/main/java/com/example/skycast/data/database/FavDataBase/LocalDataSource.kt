@@ -1,4 +1,4 @@
-package com.example.skycast.data.database
+package com.example.skycast.data.database.FavDataBase
 
 import com.example.skycast.data.models.SavedLocation
 import kotlinx.coroutines.flow.Flow
@@ -16,5 +16,6 @@ class LocalDataSource(private val locationDao: LocationDao) {
     suspend fun deleteLocation(location: SavedLocation) {
         locationDao.deleteLocation(location)
     }
+
 
 }

@@ -4,5 +4,4 @@ enum class TemperatureUnit(val displayName: String, val arabDisplayName : String
     CELSIUS("°C", "°س","metric"),
     FAHRENHEIT("°F","°ف", "imperial"),
     KELVIN("°K","ك", "standard");
-
 }

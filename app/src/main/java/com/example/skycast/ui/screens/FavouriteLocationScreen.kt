@@ -139,7 +139,6 @@ fun FavouriteLocationScreen(navController: NavController, viewModel: WeatherView
                                         duration = androidx.compose.material3.SnackbarDuration.Short
                                     )
                                     if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
-//                                        viewModel.addLocation(location)
                                         viewModel.insertFavLocation(location.name,location.latitude,location.longitude)
                                     }
                                 }
@@ -198,6 +197,7 @@ fun LocationItem(location: SavedLocation, onClick: () -> Unit, navController: Na
         Icon(imageVector = Icons.Default.LocationOn, contentDescription = stringResource(R.string.location_icon), tint = Color.White)
     }
 }
+
 
 
 
@@ -308,15 +308,15 @@ fun Map(address: MutableState<String>, latLng: MutableState<LatLng>, viewModel: 
             predictions = response.autocompletePredictions
     }
             PlacesAutocompleteTextField(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier,
                 searchText = searchText,
                 predictions = predictions.map { it.toPlaceDetails() },
                 onQueryChanged = { searchText = it },
                 onSelected = { autocompletePlace : AutocompletePlace ->
                     address.value = autocompletePlace.primaryText.toString()
                     latLng.value = getLatLngFromCity(context,address.value)!!
-//                    viewModel.insertFavLocation(address.value,latLng.value.latitude,latLng.value.longitude)
-//                    Log.i("loccccc", "lat = ${latLng.value.latitude}")
+                    viewModel.updateSelectedLocation(address.value,latLng.value.latitude,latLng.value.longitude)
+                    Log.i("loccccc", "lat = ${latLng.value.latitude}")
                 },
             )
 }

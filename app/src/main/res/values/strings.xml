@@ -13,7 +13,7 @@
     <string name="temperature">Temperature</string>
     <string name="c">°C</string>
     <string name="f">°F</string>
-    <string name="k">K</string>
+    <string name="k">°K</string>
     <string name="gps">GPS</string>
     <string name="map">Map</string>
     <string name="wind_speed">Wind speed</string>
@@ -33,4 +33,6 @@
     <string name="location_icon">Location Icon</string>
     <string name="unknown_location">Unknown Location</string>
     <string name="save_location">Save Location</string>
+    <string name="alarm">Alarm</string>
+    <string name="cancel_alarm">Cancel Alarm</string>
 </resources>
