@@ -12,17 +12,16 @@ class AlarmReceiver : BroadcastReceiver() {
         val label = intent.getStringExtra("alarm_label") ?: "Alarm"
         Toast.makeText(context, "Alarm: $label", Toast.LENGTH_LONG).show()
         val serviceIntent = Intent(context, AlarmService::class.java).apply {
-            putExtra("temperature", intent?.getDoubleExtra("temperature", 0.0))
-            putExtra("description", intent?.getStringExtra("description"))
-            putExtra("humidity", intent?.getIntExtra("humidity", 0))
-            putExtra("currentTemperatureUnit", intent?.getStringExtra("currentTemperatureUnit"))
+            putExtra("temperature", intent.getDoubleExtra("temperature", 0.0))
+            putExtra("description", intent.getStringExtra("description"))
+            putExtra("humidity", intent.getIntExtra("humidity", 0))
+            putExtra("currentTemperatureUnit", intent.getStringExtra("currentTemperatureUnit"))
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(serviceIntent)
         }else{
             context.startService(serviceIntent)
         }
-        // You can trigger a notification here instead of Toast
-//         NotifyUser(context, label)
+
     }
 }
