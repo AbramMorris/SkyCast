@@ -53,7 +53,6 @@ class LocationHelper(private val context: Context) {
         if (!hasLocationPermissions()) {
             return
         }
-
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location ->
                 if (location != null) {

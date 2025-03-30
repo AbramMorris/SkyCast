@@ -43,8 +43,10 @@ import com.example.skycast.data.models.WeatherResponse
 import com.example.skycast.R
 import com.example.skycast.data.database.FavDataBase.AppDatabase
 import com.example.skycast.data.database.FavDataBase.LocalDataSource
+import com.example.skycast.data.database.HomeDataBase.HomeLocalDataSource
 import com.example.skycast.data.remotes.WeatherApiServes
 import com.example.skycast.data.remotes.WeatherRemoteDataSourceImpl
+import com.example.skycast.data.repo.HomeCacheRepo
 import com.example.skycast.data.repo.WeatherRepositoryImpl
 import com.example.skycast.util.LocationHelper
 import com.example.skycast.viewmodel.WeatherViewModel
@@ -65,7 +67,9 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
     val remoteDataSource = WeatherRemoteDataSourceImpl(apiService)
     val local = LocalDataSource(AppDatabase.getDatabase(LocalContext.current).locationDao())
     val repository = WeatherRepositoryImpl(remoteDataSource, local)
-    val viewModel: WeatherViewModel = viewModel(factory = WeatherViewModelFactory(repository))
+    val homeLocaleDataSource = HomeLocalDataSource(AppDatabase.getDatabase(LocalContext.current).homeDao())
+    val repositoryHome = HomeCacheRepo( homeLocaleDataSource)
+    val viewModel: WeatherViewModel = viewModel(factory = WeatherViewModelFactory(repository,repositoryHome))
     val weatherState by viewModel.weatherState.collectAsState()
     val forecastState by viewModel.forecastState.collectAsState()
     val isLoading by viewModel.loading.collectAsState()
@@ -80,11 +84,16 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
             val lang = getTemperatureUnit(context, "Lang") ?: "en"
             val tempUnit = getTemperatureUnit(context, "Temp") ?: "metric"
             if (location != null) {
-                viewModel.fetchWeather(location.latitude, location.longitude, lang, tempUnit)
-                viewModel.fetchWeatherForecast(location.latitude, location.longitude, lang, tempUnit)
+                viewModel.fetchWeather(location.latitude, location.longitude, lang, tempUnit, context)
+                viewModel.fetchWeatherForecast(location.latitude, location.longitude, lang, tempUnit, context)
+                Log.d("location", "HomeForecastScreen: $location")
+                Log.d("weather", "HomeForecastScreen: ${forecastState?.list?.get(0)?.main?.temp}")
+                Log.d("weather", "HomeScreen: ${weatherState?.main?.temp}")
+
             } else {
                 viewModel.fetchWeather(-0.13, 51.51, "en", "metric")
                 viewModel.fetchWeatherForecast(51.51, -0.13, "en", "metric")
+                Log.d("location", "HomeForecastScreen$location")
             }
         }
     }

@@ -3,7 +3,10 @@ package com.example.skycast.util
 import android.app.Activity
 import android.content.Context
 import android.location.Geocoder
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.util.Log
+import androidx.work.WorkManager
 import com.example.skycast.R
 import com.example.skycast.data.enums.LanguageDisplay
 import com.example.skycast.data.enums.TemperatureUnit
@@ -12,7 +15,9 @@ import java.util.Locale
 
 fun saveTemperatureUnit(context : Context, key :String , value: String) {
         val sharedPreferences = context.getSharedPreferences("weather_prefs", Context.MODE_PRIVATE)
-
+//        if (LanguageDisplay.ARABIC.displayName == loadLanguagePreference(context)) {
+//            sharedPreferences.edit().putString(key, value).apply()
+//        }
         sharedPreferences.edit().putString(key, value).apply()
     }
 
@@ -31,6 +36,24 @@ fun mapTemperatureUnit(temperature: String): String {
         TemperatureUnit.FAHRENHEIT.arabDisplayName -> TemperatureUnit.FAHRENHEIT.code
         TemperatureUnit.KELVIN.arabDisplayName -> TemperatureUnit.KELVIN.code
         else -> TemperatureUnit.CELSIUS.code
+    }
+}
+
+fun mapTemperatureUnitToArabic(temperature: String): String {
+    return when(temperature){
+        TemperatureUnit.CELSIUS.displayName  -> TemperatureUnit.CELSIUS.arabDisplayName
+        TemperatureUnit.FAHRENHEIT.displayName -> TemperatureUnit.FAHRENHEIT.arabDisplayName
+        TemperatureUnit.KELVIN.displayName -> TemperatureUnit.KELVIN.arabDisplayName
+        else -> {TemperatureUnit.CELSIUS.arabDisplayName}
+    }
+}
+
+fun mapTemperatureUnitToEnglish(temperature: String): String {
+    return when(temperature){
+        TemperatureUnit.CELSIUS.arabDisplayName  -> TemperatureUnit.CELSIUS.displayName
+        TemperatureUnit.FAHRENHEIT.arabDisplayName -> TemperatureUnit.FAHRENHEIT.displayName
+        TemperatureUnit.KELVIN.arabDisplayName -> TemperatureUnit.KELVIN.displayName
+        else -> {TemperatureUnit.CELSIUS.displayName}
     }
 }
 
@@ -114,3 +137,17 @@ enum class WindSpeedUnit(val displayName: String, val code: String) {
     MILES_PER_HOUR("mph", "imperial");
 }
 
+fun cancelAlarmWorker(context: Context, alarmId: Int) {
+    WorkManager.getInstance(context).cancelAllWorkByTag("alarm_$alarmId")
+    Log.d("AlarmWorker", "AlarmWorker canceled for ID $alarmId")
+}
+
+fun isInternetAvailable(context: Context): Boolean {
+    val connectivityManager =
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val network = connectivityManager.activeNetwork ?: return false
+    val capabilities =
+        connectivityManager.getNetworkCapabilities(network) ?: return false
+    return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+            capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+}
