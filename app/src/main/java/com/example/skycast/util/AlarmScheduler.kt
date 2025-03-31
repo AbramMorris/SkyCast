@@ -39,11 +39,7 @@ object AlarmScheduler {
             calendar.add(Calendar.DAY_OF_YEAR, 1)
         }
 
-//        alarmManager.setExactAndAllowWhileIdle(
-//            AlarmManager.RTC_WAKEUP,
-//            calendar.timeInMillis,
-//            pendingIntent
-//        )
+
 
         val delay = calendar.timeInMillis - System.currentTimeMillis()
         val workRequest = OneTimeWorkRequestBuilder<AlarmWorker>()
@@ -61,7 +57,12 @@ object AlarmScheduler {
             ExistingWorkPolicy.REPLACE,
             workRequest
         )
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            calendar.timeInMillis,
+            pendingIntent
+        )
+//        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
     }
     fun cancelAlarm(context: Context, alarm: AlarmEntity) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager

@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
@@ -75,7 +76,7 @@ fun AlarmScreen(navController: NavHostController, viewModel: AlarmViewModel) {
             Column {
                 // Title
                 Text(
-                    text = "Saved Alarms",
+                    text = stringResource(R.string.saved_alarms),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
@@ -187,26 +188,18 @@ private fun NoAlarmsFound() {
     Spacer(modifier = Modifier.height(40.dp))
     Column (
         modifier = Modifier.fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color(android.graphics.Color.parseColor("#022a9a")),
-                        Color(android.graphics.Color.parseColor("#5381ff"))
-                    )
-                )
-            )
         , horizontalAlignment = Alignment.CenterHorizontally
         , verticalArrangement = Arrangement.Center
     ){Image(
         painter = painterResource(id = R.drawable.ic_cloud_alert), // Replace with your actual drawable
-        contentDescription = "No Alarms",
-        modifier = Modifier.size(80.dp)
+        contentDescription = stringResource(R.string.no_alarms),
+        modifier = Modifier.size(100.dp)
         , alignment = Alignment.Center
     )
         Spacer(modifier = Modifier.height(50.dp))
 
         Text(
-            text = "No alarms Found",
+            text = stringResource(R.string.no_alarms_found),
             color = Color.White,
             fontSize = 16.sp
         )  }

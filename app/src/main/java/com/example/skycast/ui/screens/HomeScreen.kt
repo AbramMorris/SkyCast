@@ -57,6 +57,7 @@ import com.example.skycast.util.DrawableUtils.getWeatherIcon
 import com.example.skycast.util.formatNumberBasedOnLanguage
 import com.example.skycast.util.formatTemperatureUnitBasedOnLanguage
 import com.example.skycast.util.getTemperatureUnit
+import com.example.skycast.util.loadLanguagePreference
 import com.example.skycast.util.setUnitSymbol
 
 
@@ -81,14 +82,18 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
 
     LaunchedEffect(Unit) {
         locationHelper.getFreshLocation { location ->
-            val lang = getTemperatureUnit(context, "Lang") ?: "en"
+            val lang = loadLanguagePreference(context)
             val tempUnit = getTemperatureUnit(context, "Temp") ?: "metric"
             if (location != null) {
                 viewModel.fetchWeather(location.latitude, location.longitude, lang, tempUnit, context)
                 viewModel.fetchWeatherForecast(location.latitude, location.longitude, lang, tempUnit, context)
-                Log.d("location", "HomeForecastScreen: $location")
-                Log.d("weather", "HomeForecastScreen: ${forecastState?.list?.get(0)?.main?.temp}")
-                Log.d("weather", "HomeScreen: ${weatherState?.main?.temp}")
+                Log.d("location", "language: $lang")
+
+//                Log.d("location", "HomeForecastScreen: $location")
+//                Log.d("weather", "HomeForecastScreen: ${forecastState?.list?.get(0)?.main?.temp}")
+//                Log.d("weather", "HomeScreen: ${weatherState?.main?.temp}")
+                Log.d("location", "lat${location.latitude}")
+                Log.d("location", "long${location.longitude}")
 
             } else {
                 viewModel.fetchWeather(-0.13, 51.51, "en", "metric")
@@ -97,6 +102,9 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
             }
         }
     }
+    Log.d("weather", "HomeForecastScreen: ${weatherState?.name}")
+
+
 
     Box(
         modifier = Modifier
@@ -206,7 +214,7 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
 fun FutureModelViewHolder(forecast: WeatherForecastResponse.ForecastItem) {
     val context = LocalContext.current
     val formattedTemp = formatNumberBasedOnLanguage(forecast.main.temp.toInt().toString())
-    val formattedUnit = formatTemperatureUnitBasedOnLanguage(setUnitSymbol(getTemperatureUnit(context, "Temp") ?: "C"), getTemperatureUnit(context, "Lang") ?: "en")
+    val formattedUnit = formatTemperatureUnitBasedOnLanguage((getTemperatureUnit(context, "Temp") ?: "C"), getTemperatureUnit(context, "Lang") ?: "en")
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Image(

@@ -34,5 +34,9 @@
     <string name="save_location">حفظ الموقع</string>
     <string name="alarm">المنبه</string>
     <string name="cancel_alarm">إلغاء المنبه</string>
+    <string name="no_alarms">لا توجد منبهات</string>
+    <string name="no_alarms_found">لم يتم العثور على أي منبهات</string>
+    <string name="saved_alarms">المنبهات المحفوظة</string>
+
 
 </resources>

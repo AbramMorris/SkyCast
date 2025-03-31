@@ -35,4 +35,7 @@
     <string name="save_location">Save Location</string>
     <string name="alarm">Alarm</string>
     <string name="cancel_alarm">Cancel Alarm</string>
+    <string name="no_alarms">No Alarms</string>
+    <string name="no_alarms_found">No alarms Found</string>
+    <string name="saved_alarms">Saved Alarms</string>
 </resources>
