@@ -142,6 +142,7 @@ fun AlarmScreenUI(navController: NavController, viewModel: AlarmViewModel) {
                     Button(
                         onClick = {
                             val alarm = AlarmEntity(
+                                id =System.currentTimeMillis().toInt(),
                                 hour = startHour,
                                 minute = startMinute,
                                 label = "Alarm on $selectedDate in $selectedCity",

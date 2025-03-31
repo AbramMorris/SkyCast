@@ -6,6 +6,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.example.skycast.data.database.AlarmDataBase.AlarmLocalDataSource
 import com.example.skycast.data.database.FavDataBase.AppDatabase
 import com.example.skycast.data.database.FavDataBase.LocalDataSource
 import com.example.skycast.data.mapper.toResponse
@@ -13,7 +14,9 @@ import com.example.skycast.data.models.Response
 import com.example.skycast.data.models.WeatherResponse
 import com.example.skycast.data.remotes.WeatherApiServes
 import com.example.skycast.data.remotes.WeatherRemoteDataSourceImpl
+import com.example.skycast.data.repo.AlarmRepoImp
 import com.example.skycast.data.repo.WeatherRepositoryImpl
+import com.example.skycast.viewmodel.AlarmViewModel
 import kotlinx.coroutines.flow.firstOrNull
 
 class AlarmWorker(
@@ -31,9 +34,17 @@ class AlarmWorker(
             val repository = WeatherRepositoryImpl(remoteDataSource, localDataSource)
             val tempUnit = getTemperatureUnit(applicationContext, "Temp") ?: "metric"
             val lang = getTemperatureUnit(applicationContext, "Lang") ?: "en"
+            val AlarmRepository = AlarmRepoImp(AlarmLocalDataSource(AppDatabase.getDatabase(applicationContext).alarmDao()) )
+            val alarm = AlarmViewModel(AlarmRepository).savedAlarms.firstOrNull()?.lastOrNull()
+            if (alarm == null) {
+                Log.d("AlarmWorker", "No alarm found in the database")
+                return Result.failure()
+            }
+            val lat = alarm.latitude
+            val lon = alarm.longitude
 
             val currentWeather: Response<WeatherResponse> =
-                repository.getCurrentWeather(30.0444, 31.2357, lang, tempUnit).firstOrNull()!!.toResponse()
+                repository.getCurrentWeather(lon, lat, lang, tempUnit).firstOrNull()!!.toResponse()
 
             when (currentWeather) {
                 is Response.Success -> {

@@ -20,7 +20,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,21 +29,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.skycast.R
-import com.example.skycast.data.models.AlarmEntity
 import com.example.skycast.ui.theme.BlueLight
-import com.example.skycast.util.MAP_KEY
-import com.example.skycast.util.getLatLngFromCity
 import com.example.skycast.viewmodel.AlarmViewModel
 import com.example.skycast.viewmodel.WeatherViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.libraries.places.api.Places
-import com.google.android.libraries.places.api.model.AutocompletePrediction
-import com.google.android.libraries.places.api.model.PlaceTypes
-import com.google.android.libraries.places.api.net.kotlin.awaitFindAutocompletePredictions
-import com.google.android.libraries.places.compose.autocomplete.components.PlacesAutocompleteTextField
-import com.google.android.libraries.places.compose.autocomplete.models.AutocompletePlace
-import com.google.android.libraries.places.compose.autocomplete.models.toPlaceDetails
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
@@ -60,9 +49,7 @@ fun AlarmMapScreen(viewModel: WeatherViewModel, alarmViewModel: AlarmViewModel, 
         position = CameraPosition.fromLatLngZoom(LatLng(20.0, 0.0), 3f) // Default world view
     }
     var loc : MutableState<LatLng> = remember { mutableStateOf(LatLng( 0.0,0.0 )) }
-    val alarmEntity by alarmViewModel.selectedAlarmLocation.collectAsStateWithLifecycle()
-//    val currentPojo : List<WeatherResponse> = viewModel.fetchWeather(loc.value.longitude,loc.value.latitude,"en","metric").toList()
-//    val forcastPojo = viewModel.fetchWeatherForecast(loc.value.latitude,loc.value.longitude,"en","metric").toList()
+//    val alarmEntity by alarmViewModel.selectedAlarmLocation.collectAsStateWithLifecycle()
 
     val addreess = remember { mutableStateOf("") }
     LaunchedEffect(selectedLocation) {
@@ -153,37 +140,3 @@ fun AlarmMapScreen(viewModel: WeatherViewModel, alarmViewModel: AlarmViewModel, 
         }
     }
 }
-
-
-//@Composable
-//fun Map(address: MutableState<String>, latLng: MutableState<LatLng>, viewModel: WeatherViewModel){
-//    val context = LocalContext.current
-//    Places.initializeWithNewPlacesApiEnabled(context, MAP_KEY)
-//    val placesClient = Places.createClient(context)
-//    var searchText by remember { mutableStateOf("") }
-//    var predictions by remember { mutableStateOf(emptyList<AutocompletePrediction>()) }
-//    val currentPojo  = viewModel.fetchWeather(latLng.value.longitude,latLng.value.latitude,"en","metric")
-//    val forecastPojo = viewModel.fetchWeatherForecast(latLng.value.latitude,latLng.value.longitude,"en","metric")
-////    val pojo = SavedLocation("",0.0,0.0, currentPojo, forecastPojo )
-//
-//
-//    LaunchedEffect(searchText) {
-//        val response = placesClient.awaitFindAutocompletePredictions {
-//            this.query = searchText
-//            typesFilter= listOf(PlaceTypes.CITIES)
-//        }
-//        predictions = response.autocompletePredictions
-//    }
-//    PlacesAutocompleteTextField(
-//        modifier = Modifier.fillMaxWidth(),
-//        searchText = searchText,
-//        predictions = predictions.map { it.toPlaceDetails() },
-//        onQueryChanged = { searchText = it },
-//        onSelected = { autocompletePlace : AutocompletePlace ->
-//            address.value = autocompletePlace.primaryText.toString()
-//            latLng.value = getLatLngFromCity(context,address.value)!!
-////                    viewModel.insertFavLocation(address.value,latLng.value.latitude,latLng.value.longitude)
-////                    Log.i("loccccc", "lat = ${latLng.value.latitude}")
-//        },
-//    )
-//}

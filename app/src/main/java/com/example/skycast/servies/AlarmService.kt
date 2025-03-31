@@ -12,7 +12,6 @@ import androidx.core.app.NotificationCompat
 import com.example.skycast.R
 import java.util.*
 import android.content.*
-
 import androidx.work.*
 import com.example.skycast.util.AlarmWorker
 import java.util.concurrent.TimeUnit
@@ -23,11 +22,9 @@ class AlarmService : Service(), TextToSpeech.OnInitListener {
     private var isTtsInitialized = false
     private var ringtone: Ringtone? = null
     private var message: String = "Fetching weather data..." // Default message
-
     private val channelId = "weather_alarms_channel"
     private val notificationId = 1
     private val stopAction = "com.example.skycast.STOP_ALARM"
-
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {

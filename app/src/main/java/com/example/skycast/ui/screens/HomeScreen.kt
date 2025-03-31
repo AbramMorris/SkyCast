@@ -43,8 +43,10 @@ import com.example.skycast.data.models.WeatherResponse
 import com.example.skycast.R
 import com.example.skycast.data.database.FavDataBase.AppDatabase
 import com.example.skycast.data.database.FavDataBase.LocalDataSource
+import com.example.skycast.data.database.HomeDataBase.HomeLocalDataSource
 import com.example.skycast.data.remotes.WeatherApiServes
 import com.example.skycast.data.remotes.WeatherRemoteDataSourceImpl
+import com.example.skycast.data.repo.HomeCacheRepo
 import com.example.skycast.data.repo.WeatherRepositoryImpl
 import com.example.skycast.util.LocationHelper
 import com.example.skycast.viewmodel.WeatherViewModel
@@ -55,6 +57,7 @@ import com.example.skycast.util.DrawableUtils.getWeatherIcon
 import com.example.skycast.util.formatNumberBasedOnLanguage
 import com.example.skycast.util.formatTemperatureUnitBasedOnLanguage
 import com.example.skycast.util.getTemperatureUnit
+import com.example.skycast.util.loadLanguagePreference
 import com.example.skycast.util.setUnitSymbol
 
 
@@ -65,7 +68,9 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
     val remoteDataSource = WeatherRemoteDataSourceImpl(apiService)
     val local = LocalDataSource(AppDatabase.getDatabase(LocalContext.current).locationDao())
     val repository = WeatherRepositoryImpl(remoteDataSource, local)
-    val viewModel: WeatherViewModel = viewModel(factory = WeatherViewModelFactory(repository))
+    val homeLocaleDataSource = HomeLocalDataSource(AppDatabase.getDatabase(LocalContext.current).homeDao())
+    val repositoryHome = HomeCacheRepo( homeLocaleDataSource)
+    val viewModel: WeatherViewModel = viewModel(factory = WeatherViewModelFactory(repository,repositoryHome))
     val weatherState by viewModel.weatherState.collectAsState()
     val forecastState by viewModel.forecastState.collectAsState()
     val isLoading by viewModel.loading.collectAsState()
@@ -77,17 +82,29 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
 
     LaunchedEffect(Unit) {
         locationHelper.getFreshLocation { location ->
-            val lang = getTemperatureUnit(context, "Lang") ?: "en"
+            val lang = loadLanguagePreference(context)
             val tempUnit = getTemperatureUnit(context, "Temp") ?: "metric"
             if (location != null) {
-                viewModel.fetchWeather(location.latitude, location.longitude, lang, tempUnit)
-                viewModel.fetchWeatherForecast(location.latitude, location.longitude, lang, tempUnit)
+                viewModel.fetchWeather(location.latitude, location.longitude, lang, tempUnit, context)
+                viewModel.fetchWeatherForecast(location.latitude, location.longitude, lang, tempUnit, context)
+                Log.d("location", "language: $lang")
+
+//                Log.d("location", "HomeForecastScreen: $location")
+//                Log.d("weather", "HomeForecastScreen: ${forecastState?.list?.get(0)?.main?.temp}")
+//                Log.d("weather", "HomeScreen: ${weatherState?.main?.temp}")
+                Log.d("location", "lat${location.latitude}")
+                Log.d("location", "long${location.longitude}")
+
             } else {
                 viewModel.fetchWeather(-0.13, 51.51, "en", "metric")
                 viewModel.fetchWeatherForecast(51.51, -0.13, "en", "metric")
+                Log.d("location", "HomeForecastScreen$location")
             }
         }
     }
+    Log.d("weather", "HomeForecastScreen: ${weatherState?.name}")
+
+
 
     Box(
         modifier = Modifier
@@ -197,7 +214,7 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
 fun FutureModelViewHolder(forecast: WeatherForecastResponse.ForecastItem) {
     val context = LocalContext.current
     val formattedTemp = formatNumberBasedOnLanguage(forecast.main.temp.toInt().toString())
-    val formattedUnit = formatTemperatureUnitBasedOnLanguage(setUnitSymbol(getTemperatureUnit(context, "Temp") ?: "C"), getTemperatureUnit(context, "Lang") ?: "en")
+    val formattedUnit = formatTemperatureUnitBasedOnLanguage((getTemperatureUnit(context, "Temp") ?: "C"), getTemperatureUnit(context, "Lang") ?: "en")
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Image(

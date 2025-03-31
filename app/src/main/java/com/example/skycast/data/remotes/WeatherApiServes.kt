@@ -16,7 +16,6 @@ interface WeatherApiServes {
         @Query("lon") longitude: Double,
         @Query("lang") lang: String,
         @Query("units") units: String,
-//        @Query("exclude") exclude: String="minutely",
         @Query("appid") apiKey: String= API_KEY
 
     ): Response<WeatherResponse>
@@ -25,8 +24,8 @@ interface WeatherApiServes {
     suspend fun getWeatherForecast(
         @Query("lat") latitude: Double,
         @Query("lon") longitude: Double,
-        @Query("units") units: String,
         @Query("lang") lang: String,
+        @Query("units") units: String,
         @Query("appid") apiKey: String= API_KEY
     ): Response<WeatherForecastResponse>
 

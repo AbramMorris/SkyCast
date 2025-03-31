@@ -6,13 +6,16 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.example.skycast.data.alarm.AlarmReceiver
 import com.example.skycast.data.models.AlarmEntity
 import java.util.*
 import java.util.concurrent.TimeUnit
+
 
 object AlarmScheduler {
     @SuppressLint("ScheduleExactAlarm")
@@ -21,9 +24,12 @@ object AlarmScheduler {
         val intent = Intent(context, AlarmReceiver::class.java).apply {
             putExtra("alarm_label", alarm.label)
         }
+        val uniqueId = "alarm_${alarm.id}"
         val pendingIntent = PendingIntent.getBroadcast(
             context, alarm.id, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
+        Log.d("AlarmScheduler", "Scheduling alarm for ID ${alarm.id}")
+        Log.d("AlarmScheduler", "Latitude: ${alarm}")
         val calendar = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, alarm.hour)
             set(Calendar.MINUTE, alarm.minute)
@@ -33,8 +39,9 @@ object AlarmScheduler {
             calendar.add(Calendar.DAY_OF_YEAR, 1)
         }
 
-        val delay = calendar.timeInMillis - System.currentTimeMillis()
 
+
+        val delay = calendar.timeInMillis - System.currentTimeMillis()
         val workRequest = OneTimeWorkRequestBuilder<AlarmWorker>()
             .setInitialDelay(delay, TimeUnit.MILLISECONDS)
             .setInputData(
@@ -42,26 +49,63 @@ object AlarmScheduler {
                     "alarm_label" to alarm.label
                 )
             )
+            .addTag(uniqueId)
             .build()
 
-        WorkManager.getInstance(context).enqueue(workRequest)
-
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            uniqueId,
+            ExistingWorkPolicy.REPLACE,
+            workRequest
+        )
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            calendar.timeInMillis,
+            pendingIntent
+        )
+//        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
     }
-}
-fun cancelAlarm(context: Context, alarmId: Int) {
-    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    fun cancelAlarm(context: Context, alarm: AlarmEntity) {
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val uniqueId = "alarm_${alarm.id}"
+        // Create the exact same PendingIntent used when scheduling the alarm
+        val intent = Intent(context, AlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context, alarm.id, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        // Cancel AlarmManager alarm
+        alarmManager.cancel(pendingIntent)
+        pendingIntent.cancel()
+        Log.d("AlarmScheduler", "AlarmManager canceled for ID ${alarm.id}")
+        // Stop the service when the alarm is deleted
+        val stopIntent = Intent(context, AlarmReceiver::class.java).apply {
+            action = "STOP_ALARM_SERVICE"
+            Log.d("AlarmScheduler", "Stopping service for ID $alarm.id")
+        }
+        context.sendBroadcast(stopIntent)
+        // Cancel WorkManager task (Make sure you set the tag when scheduling)
+        deleteScheduledAlarm(context, alarm.id)
+        Log.d("AlarmScheduler", "WorkManager task canceled for ID $alarm.id")
+    }
+    @SuppressLint("SuspiciousIndentation")
+    fun deleteScheduledAlarm(context: Context, alarmId: Int ) {
+        val workManager = WorkManager.getInstance(context)
+        val uniqueId = "alarm_$alarmId"
+            try {
+                val workInfos = workManager.getWorkInfosByTag(uniqueId).get()
 
-    // Cancel AlarmManager alarm
-    val intent = Intent(context, AlarmReceiver::class.java)
-    val pendingIntent = PendingIntent.getBroadcast(
-        context, alarmId, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-    )
-    alarmManager.cancel(pendingIntent)
-    pendingIntent.cancel()
+                if (workInfos.isEmpty()) {
+                    Log.d("AlarmWorker", "No matching work found for tag: $uniqueId")
+                }
+                workInfos.forEach { workInfo ->
+                    if (workInfo.state == WorkInfo.State.ENQUEUED || workInfo.state == WorkInfo.State.RUNNING) {
+                        workManager.cancelWorkById(workInfo.id)
+                        Log.d("AlarmWorker", "Canceled alarm with ID: ${workInfo.id}")
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("AlarmWorker", "Error fetching work info: ${e.message}")
+            }
 
-    // Cancel WorkManager task
-    WorkManager.getInstance(context).cancelAllWorkByTag("alarm_$alarmId")
+    }
 
-    Log.d("AlarmScheduler", "Alarm with ID $alarmId canceled")
 }
