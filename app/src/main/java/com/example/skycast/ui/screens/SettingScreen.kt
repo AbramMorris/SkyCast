@@ -34,13 +34,14 @@ import com.example.skycast.data.enums.LanguageDisplay
 import com.example.skycast.data.enums.WindSpeed
 import com.example.skycast.viewmodel.WeatherViewModel
 import com.example.skycast.ui.theme.BlueLight
-import com.example.skycast.util.convertMetersPerSecondToMilesPerHour
-import com.example.skycast.util.convertMilesPerHourToMetersPerSecond
 import com.example.skycast.util.getTemperatureUnit
-import com.example.skycast.util.isKelvinSelected
+import com.example.skycast.util.getWindSpeedUnit
+import com.example.skycast.util.loadLanguagePreference
 import com.example.skycast.util.restartApp
 import com.example.skycast.util.saveLanguagePreference
 import com.example.skycast.util.saveTemperatureUnit
+import com.example.skycast.util.saveWindSpeedUnit
+import com.example.skycast.util.setLangSymbol
 
 @Composable
 fun SettingsScreen( navController: NavController, viewModel: WeatherViewModel) {
@@ -48,11 +49,13 @@ fun SettingsScreen( navController: NavController, viewModel: WeatherViewModel) {
 
 
     var selectedTemperature by remember { mutableStateOf("°C") }
-    selectedTemperature = getTemperatureUnit(context, "Temp").toString()
+    selectedTemperature = getTemperatureUnit(context, "Temp")
     var selectedWindSpeed by remember { mutableStateOf("m/s") }
+    selectedWindSpeed = getWindSpeedUnit(context)
     var selectedTheme by remember { mutableStateOf("System") }
     var selectedLanguage by remember { mutableStateOf("en") }
-    selectedLanguage = getTemperatureUnit(context, "Lang").toString()
+    selectedLanguage = setLangSymbol(loadLanguagePreference(context))
+    Log.d("save","new  $selectedLanguage")
 
 
 
@@ -105,36 +108,14 @@ fun SettingsScreen( navController: NavController, viewModel: WeatherViewModel) {
 
 
         // Wind Speed
-        SettingSection(title = stringResource(R.string.wind_speed), options = listOf("meter/sec", "miles/hour"), selectedOption = selectedWindSpeed) {
+        SettingSection(title = stringResource(R.string.wind_speed),
+            options = listOf(stringResource(R.string.m_s), stringResource(R.string.mph)),
+            selectedOption = selectedWindSpeed)
+        {
             newSelection ->
             selectedWindSpeed = newSelection
-            saveTemperatureUnit(context,"Wind",newSelection)
-
+            saveWindSpeedUnit(context, newSelection)
         }
-
-        SettingSection(
-            title = stringResource(R.string.wind_speed),
-            options = listOf(WindSpeed.METERS_PER_SECOND.displayName, WindSpeed.MILES_PER_HOUR.displayName),
-            selectedOption = selectedWindSpeed
-        ) { newSelection ->
-            selectedWindSpeed = newSelection
-            saveTemperatureUnit(context, "Wind", newSelection)
-
-            // Convert wind speed based on the new selection
-            viewModel.weatherState.value?.let { weather ->
-                val currentSpeed = weather.wind.speed // Assuming API response contains wind speed
-                val convertedSpeed = when {
-                    selectedWindSpeed == "miles/hour" && isKelvinSelected(context) -> currentSpeed // No conversion needed, API already returns mph
-                    selectedWindSpeed == "miles/hour" -> convertMetersPerSecondToMilesPerHour(currentSpeed)
-                    selectedWindSpeed == "meter/sec" && isKelvinSelected(context) -> convertMilesPerHourToMetersPerSecond(currentSpeed)
-                    else -> currentSpeed // No conversion needed, API already returns m/s
-                }
-                saveTemperatureUnit(context,"WindSpeed",newSelection)
-                // Update the UI or ViewModel with the converted wind speed
-                viewModel.updateWindSpeed(convertedSpeed)
-            }
-        }
-
 
 //         Language
         SettingSection(

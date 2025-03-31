@@ -22,7 +22,7 @@
     <string name="wind">الرياح</string>
     <string name="pressure">الضغط</string>
     <string name="cloud">السحب</string>
-    <string name="hpa">%1$s هكتوباسكال</string>
+    <string name="hpa">% هكتوباسكال</string>
     <string name="home">الرئيسية</string>
     <string name="favourite">المفضلة</string>
     <string name="alert">التنبيهات</string>
@@ -37,6 +37,11 @@
     <string name="no_alarms">لا توجد منبهات</string>
     <string name="no_alarms_found">لم يتم العثور على أي منبهات</string>
     <string name="saved_alarms">المنبهات المحفوظة</string>
+    <string name="m_s">م/ث</string>
+    <string name="mph">م/س</string>
+    <string name="clouds">سحب</string>
+
+
 
 
 </resources>

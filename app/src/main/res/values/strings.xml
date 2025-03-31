@@ -23,7 +23,7 @@
     <string name="wind">Wind</string>
     <string name="pressure">Pressure</string>
     <string name="cloud">cloud</string>
-    <string name="hpa">%1$s hPa</string>
+    <string name="hpa">% hPa</string>
     <string name="home">home</string>
     <string name="favourite">favourite</string>
     <string name="alert">alert</string>
@@ -38,4 +38,7 @@
     <string name="no_alarms">No Alarms</string>
     <string name="no_alarms_found">No alarms Found</string>
     <string name="saved_alarms">Saved Alarms</string>
+    <string name="m_s">m/s</string>
+    <string name="mph">mph</string>
+    <string name="clouds">Clouds</string>
 </resources>
