@@ -32,5 +32,7 @@
     <string name="location_icon">أيقونة الموقع</string>
     <string name="unknown_location">موقع غير معروف</string>
     <string name="save_location">حفظ الموقع</string>
+    <string name="alarm">المنبه</string>
+    <string name="cancel_alarm">إلغاء المنبه</string>
 
 </resources>

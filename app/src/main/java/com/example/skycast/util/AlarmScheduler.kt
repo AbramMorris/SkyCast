@@ -28,15 +28,22 @@ object AlarmScheduler {
         val pendingIntent = PendingIntent.getBroadcast(
             context, alarm.id, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
+        Log.d("AlarmScheduler", "Scheduling alarm for ID ${alarm.id}")
+        Log.d("AlarmScheduler", "Latitude: ${alarm}")
         val calendar = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, alarm.hour)
             set(Calendar.MINUTE, alarm.minute)
             set(Calendar.SECOND, 0)
         }
-
         if (calendar.timeInMillis < System.currentTimeMillis()) {
             calendar.add(Calendar.DAY_OF_YEAR, 1)
         }
+
+//        alarmManager.setExactAndAllowWhileIdle(
+//            AlarmManager.RTC_WAKEUP,
+//            calendar.timeInMillis,
+//            pendingIntent
+//        )
 
         val delay = calendar.timeInMillis - System.currentTimeMillis()
         val workRequest = OneTimeWorkRequestBuilder<AlarmWorker>()
@@ -66,9 +73,14 @@ object AlarmScheduler {
         )
         // Cancel AlarmManager alarm
         alarmManager.cancel(pendingIntent)
-//        alarmManager.cancelAll()
         pendingIntent.cancel()
-        Log.d("AlarmScheduler", "AlarmManager canceled for ID $alarm.id")
+        Log.d("AlarmScheduler", "AlarmManager canceled for ID ${alarm.id}")
+        // Stop the service when the alarm is deleted
+        val stopIntent = Intent(context, AlarmReceiver::class.java).apply {
+            action = "STOP_ALARM_SERVICE"
+            Log.d("AlarmScheduler", "Stopping service for ID $alarm.id")
+        }
+        context.sendBroadcast(stopIntent)
         // Cancel WorkManager task (Make sure you set the tag when scheduling)
         deleteScheduledAlarm(context, alarm.id)
         Log.d("AlarmScheduler", "WorkManager task canceled for ID $alarm.id")

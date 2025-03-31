@@ -305,6 +305,14 @@ fun fetchWeather(long: Double, lat: Double, lang: String, unit: String, context:
             }
         }
     }
+
+    fun updateWindSpeed(speed: Double) {
+        viewModelScope.launch {
+            _weatherState.value?.let { currentWeather ->
+                _weatherState.value = currentWeather.copy(wind = currentWeather.wind.copy(speed = speed))
+            }
+        }
+    }
 }
 
 

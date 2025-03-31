@@ -9,6 +9,13 @@ import com.example.skycast.services.AlarmService
 
 class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
+
+        val action = intent.action
+        if (action == "STOP_ALARM_SERVICE") {
+            context.stopService(Intent(context, AlarmService::class.java))
+            return
+        }
+
         val label = intent.getStringExtra("alarm_label") ?: "Alarm"
         Toast.makeText(context, "Alarm: $label", Toast.LENGTH_LONG).show()
         val serviceIntent = Intent(context, AlarmService::class.java).apply {

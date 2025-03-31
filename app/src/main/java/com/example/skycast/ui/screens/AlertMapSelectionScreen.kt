@@ -20,7 +20,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,10 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.skycast.R
-import com.example.skycast.data.models.AlarmEntity
 import com.example.skycast.ui.theme.BlueLight
-import com.example.skycast.util.MAP_KEY
-import com.example.skycast.util.getLatLngFromCity
 import com.example.skycast.viewmodel.AlarmViewModel
 import com.example.skycast.viewmodel.WeatherViewModel
 import com.google.android.gms.maps.model.CameraPosition

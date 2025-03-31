@@ -12,7 +12,7 @@ import com.example.skycast.data.models.Converters
 import com.example.skycast.data.models.HomeCached
 import com.example.skycast.data.models.SavedLocation
 
-@Database(entities = [SavedLocation::class, AlarmEntity::class , HomeCached::class], version = 3, exportSchema = false)
+@Database(entities = [SavedLocation::class, AlarmEntity::class , HomeCached::class], version = 4, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun locationDao(): LocationDao

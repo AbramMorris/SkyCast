@@ -7,26 +7,40 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.util.Log
 import androidx.work.WorkManager
-import com.example.skycast.R
 import com.example.skycast.data.enums.LanguageDisplay
 import com.example.skycast.data.enums.TemperatureUnit
 import com.google.android.gms.maps.model.LatLng
 import java.util.Locale
 
-fun saveTemperatureUnit(context : Context, key :String , value: String) {
-        val sharedPreferences = context.getSharedPreferences("weather_prefs", Context.MODE_PRIVATE)
-//        if (LanguageDisplay.ARABIC.displayName == loadLanguagePreference(context)) {
-//            sharedPreferences.edit().putString(key, value).apply()
-//        }
-        sharedPreferences.edit().putString(key, value).apply()
+//fun saveTemperatureUnit(context : Context, key :String , value: String) {
+//        val sharedPreferences = context.getSharedPreferences("weather_prefs", Context.MODE_PRIVATE)
+////        if (LanguageDisplay.ARABIC.displayName == loadLanguagePreference(context)) {
+////            sharedPreferences.edit().putString(key, value).apply()
+////        }
+//        sharedPreferences.edit().putString(key, value).apply()
+//    }
+//
+//    fun getTemperatureUnit(context : Context, key: String): String? {
+//        val sharedPreferences = context.getSharedPreferences("weather_prefs", Context.MODE_PRIVATE)
+//        return sharedPreferences.getString(key, "C")
+//    }
+
+fun saveTemperatureUnit(context: Context, key: String, unit: String) {
+    val englishUnit = mapTemperatureUnitToEnglish(unit) // Ensure it's saved in English
+    val sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+    sharedPreferences.edit().putString(key, englishUnit).apply()
+}
+
+fun getTemperatureUnit(context: Context, key: String): String {
+    val sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+    val savedUnit = sharedPreferences.getString(key, TemperatureUnit.CELSIUS.displayName) ?: TemperatureUnit.CELSIUS.displayName
+
+    return if (LanguageDisplay.ARABIC.code== loadLanguagePreference(context)) {
+        mapTemperatureUnitToArabic(savedUnit) // Convert to Arabic when retrieving
+    } else {
+        mapTemperatureUnitToEnglish(savedUnit) // Convert to English when retrieving
     }
-
-    fun getTemperatureUnit(context : Context, key: String): String? {
-        val sharedPreferences = context.getSharedPreferences("weather_prefs", Context.MODE_PRIVATE)
-        return sharedPreferences.getString(key, "C")
-    }
-
-
+}
 fun mapTemperatureUnit(temperature: String): String {
     return when(temperature){
         TemperatureUnit.CELSIUS.displayName  -> TemperatureUnit.CELSIUS.code
@@ -50,6 +64,9 @@ fun mapTemperatureUnitToArabic(temperature: String): String {
 
 fun mapTemperatureUnitToEnglish(temperature: String): String {
     return when(temperature){
+        TemperatureUnit.CELSIUS.displayName  -> TemperatureUnit.CELSIUS.displayName
+        TemperatureUnit.FAHRENHEIT.displayName -> TemperatureUnit.FAHRENHEIT.displayName
+        TemperatureUnit.KELVIN.displayName -> TemperatureUnit.KELVIN.displayName
         TemperatureUnit.CELSIUS.arabDisplayName  -> TemperatureUnit.CELSIUS.displayName
         TemperatureUnit.FAHRENHEIT.arabDisplayName -> TemperatureUnit.FAHRENHEIT.displayName
         TemperatureUnit.KELVIN.arabDisplayName -> TemperatureUnit.KELVIN.displayName
@@ -78,8 +95,21 @@ fun getLatLngFromCity(context: Context, cityName: String): LatLng? {
         null
     }
 }
+
 fun convertMetersPerSecondToMilesPerHour(speedInMetersPerSecond: Double): Double {
     return speedInMetersPerSecond * 2.23694
+}
+fun convertMilesPerHourToMetersPerSecond(speedInMilesPerHour: Double): Double {
+    return speedInMilesPerHour / 2.23694
+}
+fun windSpeedUnit(context: Context): String {
+    val windSpeedUnit = getTemperatureUnit(context, "Wind")
+    return if (windSpeedUnit == "imperial") "mph" else "m/s"
+}
+fun windSpeedConverter(context: Context, speed: Double): Double {
+    val windSpeedUnit = getTemperatureUnit(context, "Wind")
+    return if (windSpeedUnit == "imperial") convertMetersPerSecondToMilesPerHour(speed) else speed
+
 }
 
 fun setLanguage(currentLang: String): String {
@@ -151,3 +181,9 @@ fun isInternetAvailable(context: Context): Boolean {
     return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
             capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
 }
+
+fun isKelvinSelected(context: Context): Boolean {
+    val selectedUnit = getTemperatureUnit(context, "Temp")
+    return selectedUnit == TemperatureUnit.KELVIN.displayName
+}
+

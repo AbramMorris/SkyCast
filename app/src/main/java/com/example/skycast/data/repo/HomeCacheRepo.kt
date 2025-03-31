@@ -13,9 +13,6 @@ class HomeCacheRepo( private val homeLocalDataSource: HomeLocalDataSource) {
     suspend fun deleteHome() {
         homeLocalDataSource.deleteHome()
     }
-    suspend fun updateHome(home: HomeCached) {
-        homeLocalDataSource.updateHome(home)
-    }
 
 
 }
