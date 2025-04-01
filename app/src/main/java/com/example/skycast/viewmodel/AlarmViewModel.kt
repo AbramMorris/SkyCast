@@ -3,7 +3,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.skycast.data.models.AlarmEntity
-import com.example.skycast.data.models.SavedLocation
 import com.example.skycast.data.repo.AlarmRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,6 +38,7 @@ class AlarmViewModel(private val AlarmRepository: AlarmRepository) : ViewModel()
         }
     }
 }
+
 class AlertViewModelFactory(private val repository: AlarmRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(AlarmViewModel::class.java)) {

@@ -31,7 +31,6 @@ import androidx.navigation.NavController
 import com.example.skycast.R
 import com.example.skycast.ui.navigation.ScreenRoute
 import com.example.skycast.ui.theme.BlueLight
-import com.example.skycast.viewmodel.AlarmViewModel
 import com.example.skycast.viewmodel.WeatherViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -46,7 +45,7 @@ fun SettingMapScreen(viewModel: WeatherViewModel, navController: NavController) 
     val context = LocalContext.current
     val selectedHome by viewModel.selectedLocation.collectAsStateWithLifecycle()
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(LatLng(20.0, 0.0), 3f) // Default world view
+        position = CameraPosition.fromLatLngZoom(LatLng(20.0, 0.0), 3f)
     }
     var loc : MutableState<LatLng> = remember { mutableStateOf(LatLng( 0.0,0.0 )) }
 
@@ -133,66 +132,3 @@ fun SettingMapScreen(viewModel: WeatherViewModel, navController: NavController) 
         }
     }
 }
-
-
-//@Composable
-//fun SettingMapScreen(viewModel: WeatherViewModel, navController: NavController) {
-//    val context = LocalContext.current
-//    val selectedLocation by viewModel.selectedLocation.collectAsState()
-//    val cameraPositionState = rememberCameraPositionState {
-//        position = CameraPosition.fromLatLngZoom(viewModel.getSavedLocation(), 10f)
-//    }
-//    val address = remember { mutableStateOf("") }
-//
-//    Box(modifier = Modifier.fillMaxSize()) {
-//        Column(modifier = Modifier.fillMaxSize()) {
-//            GoogleMap(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .weight(1f),
-//                cameraPositionState = cameraPositionState,
-//                onMapClick = { latLng ->
-//                    val geocoder = Geocoder(context, Locale.getDefault())
-//                    val addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
-//                    address.value = addresses?.firstOrNull()?.getAddressLine(0) ?: "Unknown Location"
-//                    viewModel.updateSelectedLocation( address.value,latLng.latitude, latLng.longitude)
-//                }
-//            ) {
-//                selectedLocation?.let {
-//                    var latLng = LatLng(it.second, it.third)
-//                    Marker(
-//                        state = MarkerState(latLng),
-//                        title = "Selected Location"
-//                    )
-//                }
-//            }
-//        }
-//
-//        // Bottom Card with Save Button
-//        Card(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .align(Alignment.BottomCenter)
-//                .padding(16.dp),
-//            shape = RoundedCornerShape(16.dp),
-//            colors = CardDefaults.cardColors(containerColor = Color(0xFF0D0F33))
-//        ) {
-//            Column(
-//                modifier = Modifier.padding(16.dp),
-//                horizontalAlignment = Alignment.CenterHorizontally
-//            ) {
-//                Text(text = address.value, color = Color.White)
-//                Button(
-//                    onClick = {
-//                        navController.navigate("home") // Navigate back to HomeScreen
-//                    },
-//                    colors = ButtonDefaults.buttonColors(containerColor = BlueLight),
-//                    modifier = Modifier.padding(bottom = 8.dp),
-//                    shape = RoundedCornerShape(10.dp)
-//                ) {
-//                    Text(text = stringResource(R.string.save_location), color = Color.White)
-//                }
-//            }
-//        }
-//    }
-//}
