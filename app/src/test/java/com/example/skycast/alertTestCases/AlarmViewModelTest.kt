@@ -5,7 +5,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.skycast.data.models.AlarmEntity
 import com.example.skycast.getOrAwaitValue
 import com.example.skycast.viewmodel.AlarmViewModel
+import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.runTest
+import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.nullValue
 import org.junit.Assert.assertThat
@@ -41,5 +43,25 @@ class AlarmViewModelTest  {
         assertThat(value, not(nullValue()))
 
     }
+    @Test
+    fun deleteAlert_CheckTheListIsEmpty() = runTest {
+        // when-> Call insert and delete Methods
+        viewModel.insertAlarm(alarm1)
+        viewModel.deleteAlarm(alarm1)
+
+        var value = viewModel._selectedAlarmLocation.getOrAwaitValue {  }
+        assertThat(value, `is`(Triple("", 0.0, 0.0)))
+
+    }
+    @Test
+    fun getAlerts_CheckTheListIsNotEmpty() = runTest {
+        // when-> Call insert Method
+        viewModel.insertAlarm(alarm1)
+        viewModel.insertAlarm(alarm2)
+        viewModel.getAllAlarms()
+        var value = viewModel._selectedAlarmLocation.getOrAwaitValue {  }
+        assertThat(value, not(nullValue()))
+    }
+
 
 }
