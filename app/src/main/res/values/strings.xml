@@ -41,4 +41,6 @@
     <string name="m_s">m/s</string>
     <string name="mph">mph</string>
     <string name="clouds">Clouds</string>
+    <string name="this_is_the_last_data_when_you_are_connected_to_the_internet">This Is The Last Data When \n You Are Connected To The Internet</string>
+    <string name="no_favourite_locations">No Favourite Locations</string>
 </resources>

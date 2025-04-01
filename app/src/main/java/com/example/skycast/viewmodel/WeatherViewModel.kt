@@ -19,6 +19,7 @@ import com.example.skycast.data.mapper.toList
 import com.example.skycast.data.models.HomeCached
 import com.example.skycast.data.repo.HomeCacheRepo
 import com.example.skycast.util.isInternetAvailable
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -55,14 +56,21 @@ class WeatherViewModel(private val repository: WeatherRepository , private val h
     private val mutableMessage = MutableSharedFlow<String>()
     val message: SharedFlow<String> = mutableMessage.asSharedFlow()
 
+    private val _locationMethod = MutableStateFlow("GPS")
+    val locationMethod: StateFlow<String> = _locationMethod
+
+
+    private val _selectedHomeLocation = MutableStateFlow<Triple<String, Double, Double>?>(null)
+    val selectedHomeLocation: StateFlow<Triple<String, Double, Double>?> = _selectedHomeLocation
+
     val isLoading = MutableStateFlow(false)
 
-    fun fetchWeather( long :Double, lat :Double, lang: String ,unit :String)  {
-        var newTemp =mapTemperatureUnit(unit)
+    fun fetchWeather(long: Double, lat: Double, lang: String, unit: String) {
+        var newTemp = mapTemperatureUnit(unit)
         var newLang = setLanguage(lang)
         viewModelScope.launch {
             _loading.value = true
-            repository.getCurrentWeather( long , lat , newLang ,newTemp).collectLatest { result ->
+            repository.getCurrentWeather(long, lat, newLang, newTemp).collectLatest { result ->
                 result.onSuccess { _weatherState.value = it }
                 result.onFailure { _errorMessage.value = it.message }
                 _loading.value = false
@@ -70,15 +78,15 @@ class WeatherViewModel(private val repository: WeatherRepository , private val h
         }
     }
 
-    fun fetchWeatherForecast(lat: Double, lon: Double, lang: String ,unit: String) {
-        var newTemp =mapTemperatureUnit(unit)
-        Log.d("unit", "fetchWeatherForecast: $newTemp")
+    fun fetchWeatherForecast(lat: Double, lon: Double, lang: String, unit: String) {
+        var newTemp = mapTemperatureUnit(unit)
         var newLang = setLanguage(lang)
         viewModelScope.launch {
             _loading.value = true
-            repository.getWeatherForecast(lat, lon, newTemp ,newLang).collectLatest { result ->
-                result.onSuccess { _forecastState.value = it
-                Log.d("forecast", "fetchWeatherForecast: ${it.list.get(0).main.temp}")
+            repository.getWeatherForecast(lat, lon, newTemp, newLang).collectLatest { result ->
+                result.onSuccess {
+                    _forecastState.value = it
+                    Log.d("forecast", "fetchWeatherForecast: ${it.list.get(0).main.temp}")
                 }
                 result.onFailure { _errorMessage.value = it.message }
                 _loading.value = false
@@ -86,13 +94,13 @@ class WeatherViewModel(private val repository: WeatherRepository , private val h
         }
     }
 
-    private val _selectedLocation = MutableStateFlow(Triple("",0.0,0.0))
+    private val _selectedLocation = MutableStateFlow(Triple("", 0.0, 0.0))
     var selectedLocation = _selectedLocation.asStateFlow()
 
     val savedLocations: Flow<List<SavedLocation>> = repository.getAllLocations()
 
-    fun updateSelectedLocation( locationName: String, log : Double, lat :Double) {
-        _selectedLocation.value = Triple(locationName,log,lat)
+    fun updateSelectedLocation(locationName: String, log: Double, lat: Double) {
+        _selectedLocation.value = Triple(locationName, log, lat)
     }
 
     fun getFavLocations() {
@@ -109,7 +117,7 @@ class WeatherViewModel(private val repository: WeatherRepository , private val h
         }
     }
 
-    fun insertFavLocation(country: String,lat: Double, lon: Double){
+    fun insertFavLocation(country: String, lat: Double, lon: Double) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val currentWeather = repository.getCurrentWeather(lon, lat, "en", "metric").first()
@@ -136,32 +144,38 @@ class WeatherViewModel(private val repository: WeatherRepository , private val h
         return homeCacheRepo.getHome()
     }
 
-fun fetchWeather(long: Double, lat: Double, lang: String, unit: String, context: Context) {
-    val newTemp = mapTemperatureUnit(unit)
-    val newLang =lang
-    Log.d("lang", "fetchWeather: $newLang")
+    fun fetchWeather(long: Double, lat: Double, lang: String, unit: String, context: Context) {
+        val newTemp = mapTemperatureUnit(unit)
+        val newLang = lang
+        Log.d("lang", "fetchWeather: $newLang")
 
-    viewModelScope.launch {
-        _loading.value = true
-        if (isInternetAvailable(context)) {
-            repository.getCurrentWeather(long, lat, newLang, newTemp).collectLatest { result ->
-                result.onSuccess {
-                    _weatherState.value = it
-                    cacheHomeData(it, null)
+        viewModelScope.launch {
+            _loading.value = true
+            if (isInternetAvailable(context)) {
+                repository.getCurrentWeather(long, lat, newLang, newTemp).collectLatest { result ->
+                    result.onSuccess {
+                        _weatherState.value = it
+                        cacheHomeData(it, null)
+                    }
+                    result.onFailure {
+                        _errorMessage.value = it.message
+                        fetchWeatherFromCache()
+                    }
                 }
-                result.onFailure {
-                    _errorMessage.value = it.message
-                    fetchWeatherFromCache()
-                }
+            } else {
+                fetchWeatherFromCache()
             }
-        } else {
-            fetchWeatherFromCache()
+            _loading.value = false
         }
-        _loading.value = false
     }
-}
 
-    fun fetchWeatherForecast(lat: Double, lon: Double, lang: String, unit: String, context: Context) {
+    fun fetchWeatherForecast(
+        lat: Double,
+        lon: Double,
+        lang: String,
+        unit: String,
+        context: Context
+    ) {
         val newTemp = mapTemperatureUnit(unit)
         val newLang = lang
 
@@ -212,7 +226,8 @@ fun fetchWeather(long: Double, lat: Double, lang: String, unit: String, context:
                 val home = existingHome?.copy(
                     weatherPojo = weather?.let { listOf(it) } ?: existingHome.weatherPojo,
                     forecastPojo = forecast?.let { listOf(it) } ?: existingHome.forecastPojo
-                ) ?: HomeCached(weatherPojo = weather?.let { listOf(it) } ?: emptyList(), forecastPojo = forecast?.let { listOf(it) } ?: emptyList())
+                ) ?: HomeCached(weatherPojo = weather?.let { listOf(it) } ?: emptyList(),
+                    forecastPojo = forecast?.let { listOf(it) } ?: emptyList())
                 homeCacheRepo.insertHome(home)
                 Log.d("WeatherViewModel", "Data cached successfully")
             } catch (e: Exception) {
@@ -221,15 +236,40 @@ fun fetchWeather(long: Double, lat: Double, lang: String, unit: String, context:
         }
     }
 
-    fun updateWindSpeed(speed: Double) {
-        viewModelScope.launch {
-            _weatherState.value?.let { currentWeather ->
-                _weatherState.value = currentWeather.copy(wind = currentWeather.wind.copy(speed = speed))
-            }
-        }
+    fun setLocationMethod(method: String) {
+        _locationMethod.value = method
     }
-}
 
+    fun getSavedHomeLocation(context: Context): LatLng {
+        val location = _selectedHomeLocation.value
+
+        if (location != null) {
+            return LatLng(location.second, location.third)
+        }
+        // Load from SharedPreferences
+        val sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+        val lat = sharedPreferences.getFloat("home_latitude", 0.0f).toDouble()
+        val lng = sharedPreferences.getFloat("home_longitude", 0.0f).toDouble()
+        Log.d("getSavedHomeLocation", "Loaded from SharedPreferences: lat=$lat, lng=$lng")
+        return LatLng(lat, lng)
+
+
+    }
+
+    fun updateSelectedHomeLocation(name: String, lat: Double, lng: Double, context: Context) {
+        _selectedHomeLocation.value = Triple(name, lat, lng)
+        Log.d("getSavedHomeLocation", "Updated Location: $name, $lat, $lng")
+
+        // Save to SharedPreferences
+        val sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+        sharedPreferences.edit()
+            .putString("home_location_name", name)
+            .putFloat("home_latitude", lat.toFloat())
+            .putFloat("home_longitude", lng.toFloat())
+            .apply()
+    }
+
+}
 
 
 class WeatherViewModelFactory(private val repository: WeatherRepository , private val homeCacheRepo: HomeCacheRepo) : ViewModelProvider.Factory {
