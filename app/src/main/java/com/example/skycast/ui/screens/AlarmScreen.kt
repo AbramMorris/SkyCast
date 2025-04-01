@@ -119,7 +119,6 @@ fun SwipeToDeleteAlarm(
                     viewModel.deleteAlarm(alarm)
                     cancelAlarm(context, alarm)
                     cancelAlarmWorker(context, alarm.id)
-//                    viewModel.getAllAlarms()
                 }
             }
             true
@@ -190,7 +189,7 @@ fun AlarmItem(alarm: AlarmEntity) {
 fun extractCityAndCountry(address: String): String {
     try {
         return address.split(", ")
-            .takeLast(3) // Get the last three parts (assuming they contain city and country)
+            .takeLast(3)
             .let { listOf(it.first(), it[1].split(" ").first(), it.last()) }
             .joinToString(", ")
     }catch (
@@ -209,7 +208,7 @@ private fun NoAlarmsFound() {
         , horizontalAlignment = Alignment.CenterHorizontally
         , verticalArrangement = Arrangement.Center
     ){Image(
-        painter = painterResource(id = R.drawable.ic_cloud_alert), // Replace with your actual drawable
+        painter = painterResource(id = R.drawable.ic_cloud_alert),
         contentDescription = stringResource(R.string.no_alarms),
         modifier = Modifier.size(100.dp)
         , alignment = Alignment.Center

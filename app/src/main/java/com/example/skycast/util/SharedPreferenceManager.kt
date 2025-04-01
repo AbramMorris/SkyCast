@@ -8,6 +8,7 @@ import android.net.NetworkCapabilities
 import android.util.Log
 import androidx.work.WorkManager
 import com.example.skycast.data.enums.LanguageDisplay
+import com.example.skycast.data.enums.LocationLocator
 import com.example.skycast.data.enums.TemperatureUnit
 import com.example.skycast.data.enums.WindSpeed
 import com.google.android.gms.maps.model.LatLng
@@ -25,9 +26,9 @@ fun getTemperatureUnit(context: Context, key: String): String {
     val savedUnit = sharedPreferences.getString(key, TemperatureUnit.CELSIUS.displayName) ?: TemperatureUnit.CELSIUS.displayName
 
     return if (LanguageDisplay.ARABIC.code== loadLanguagePreference(context)) {
-        mapTemperatureUnitToArabic(savedUnit) // Convert to Arabic when retrieving
+        mapTemperatureUnitToArabic(savedUnit)
     } else {
-        mapTemperatureUnitToEnglish(savedUnit) // Convert to English when retrieving
+        mapTemperatureUnitToEnglish(savedUnit)
     }
 }
 
@@ -45,14 +46,12 @@ fun saveWindSpeedUnit(context: Context, unit: String) {
     val englishUnit = mapWindSpeedUnitToEnglish(unit)
     val sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
     sharedPreferences.edit().putString("Wind", unit).apply()
-    // Ensure temperature is converted based on wind speed unit
     convertWindSpeedWithTempUnit(context, englishUnit)
     Log.d("saveWindSpeedUnit", "saveWindSpeedUnit: $unit")
 }
 
 fun getWindSpeedUnit(context: Context): String {
     val sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-//    return sharedPreferences.getString("Wind", WindSpeed.METERS_PER_SECOND.displayName) ?: WindSpeed.METERS_PER_SECOND.displayName
     return if (LanguageDisplay.ARABIC.code== loadLanguagePreference(context)) {
         mapWindSpeedUnitToArabic(sharedPreferences.getString("Wind", WindSpeed.METERS_PER_SECOND.displayName) ?: WindSpeed.METERS_PER_SECOND.displayName)
         } else {
@@ -194,4 +193,64 @@ fun isInternetAvailable(context: Context): Boolean {
     return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
             capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
 }
+fun shouldShowNetworkToast(context: Context): Boolean {
+    val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+    val hasShownToast = sharedPreferences.getBoolean("network_toast_shown", false)
+
+    if (!hasShownToast) {
+        sharedPreferences.edit().putBoolean("network_toast_shown", true).apply()
+        return true
+    }
+    return false
+}
+fun saveLocationMethod(context: Context, method: String)  {
+    val sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+    sharedPreferences.edit().putString("location_method", method).apply()
+
+}
+
+fun getLocationMethod(context: Context): String {
+    val sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+    val method = sharedPreferences.getString("location_method", "GPS") ?: "GPS"
+    return if (LanguageDisplay.ARABIC.code== loadLanguagePreference(context)) {
+        mapLocationLocatorToArabic(method)
+    } else {
+        mapLocationLocatorToEnglish(method)
+    }
+}
+fun mapLocationLocatorToArabic(location: String): String {
+    return when (location) {
+        LocationLocator.GPS.displayName -> LocationLocator.GPS.arabDisplayName
+        LocationLocator.MAP.displayName -> LocationLocator.MAP.arabDisplayName
+        LocationLocator.GPS.arabDisplayName -> LocationLocator.GPS.arabDisplayName
+        LocationLocator.MAP.arabDisplayName -> LocationLocator.MAP.arabDisplayName
+        else -> {
+            LocationLocator.GPS.arabDisplayName
+        }
+    }
+}
+
+    fun mapLocationLocatorToEnglish(location: String): String {
+        return when (location) {
+            LocationLocator.GPS.displayName -> LocationLocator.GPS.displayName
+            LocationLocator.MAP.displayName -> LocationLocator.MAP.displayName
+            LocationLocator.GPS.arabDisplayName -> LocationLocator.GPS.displayName
+            LocationLocator.MAP.arabDisplayName -> LocationLocator.MAP.displayName
+            else -> {
+                LocationLocator.GPS.displayName
+            }
+        }
+    }
+
+    fun mapLocationLocator(location: String): String {
+        return when (location) {
+            LocationLocator.GPS.displayName -> LocationLocator.GPS.code
+            LocationLocator.MAP.displayName -> LocationLocator.MAP.code
+            LocationLocator.GPS.arabDisplayName -> LocationLocator.GPS.code
+            LocationLocator.MAP.arabDisplayName -> LocationLocator.MAP.code
+            else -> {
+                LocationLocator.GPS.code
+            }
+        }
+    }
 
