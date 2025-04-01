@@ -13,6 +13,7 @@ interface WeatherRepository {
     fun getCurrentWeather( long :Double, lat :Double, lang: String,unit:String ): Flow<Result<WeatherResponse>>
     fun getWeatherForecast(lat: Double, lon: Double, lang: String ,unit:String): Flow<Result<WeatherForecastResponse>>
     fun getAllLocations(): Flow<List<SavedLocation>>
+    suspend fun getLocationByCoordinates(lat: Double, lon: Double): SavedLocation?
     suspend fun insertLocation(location: SavedLocation)
     suspend fun deleteLocation(location: SavedLocation)
 
@@ -42,6 +43,9 @@ class WeatherRepositoryImpl(private val remoteDataSource: WeatherRemoteDataSourc
 
     override suspend fun deleteLocation(location: SavedLocation) {
         localDataSource.deleteLocation(location)
+    }
+    override suspend fun getLocationByCoordinates(lat: Double, lon: Double): SavedLocation? {
+        return localDataSource.getLocationByCoordinates(lat, lon)
     }
 
 

@@ -19,4 +19,7 @@ interface LocationDao {
     @Delete
     suspend fun deleteLocation(location: SavedLocation)
 
+    @Query("SELECT * FROM saved_locations WHERE latitude = :lat AND longitude = :lon")
+    suspend fun getLocationByCoordinates(lat: Double, lon: Double): SavedLocation?
+
 }

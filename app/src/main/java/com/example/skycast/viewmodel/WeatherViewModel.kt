@@ -61,7 +61,6 @@ class WeatherViewModel(private val repository: WeatherRepository , private val h
 
 
     private val _selectedHomeLocation = MutableStateFlow<Triple<String, Double, Double>?>(null)
-    val selectedHomeLocation: StateFlow<Triple<String, Double, Double>?> = _selectedHomeLocation
 
     val isLoading = MutableStateFlow(false)
 
@@ -111,12 +110,25 @@ class WeatherViewModel(private val repository: WeatherRepository , private val h
         }
     }
 
+
+
     fun removeLocation(location: SavedLocation) {
         viewModelScope.launch {
             repository.deleteLocation(location)
         }
     }
-
+    fun getFavLocation(lat: Double, lon: Double) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val location = repository.getLocationByCoordinates(lat, lon)
+                location?.let {
+                    _selectedLocation.emit(Triple(it.name, it.longitude, it.latitude))
+                } ?: mutableMessage.emit("Location not found in favorites")
+            } catch (e: Exception) {
+                mutableMessage.emit("Error fetching location: ${e.message}")
+            }
+        }
+    }
     fun insertFavLocation(country: String, lat: Double, lon: Double) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
