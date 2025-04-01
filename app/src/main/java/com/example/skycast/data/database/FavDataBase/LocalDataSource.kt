@@ -16,6 +16,10 @@ class LocalDataSource(private val locationDao: LocationDao) {
     suspend fun deleteLocation(location: SavedLocation) {
         locationDao.deleteLocation(location)
     }
+    suspend fun getLocationByCoordinates(lat: Double, lon: Double): SavedLocation? {
+        return locationDao.getLocationByCoordinates(lat, lon)
+    }
+
 
 
 }
