@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -168,20 +169,37 @@ fun AlarmItem(alarm: AlarmEntity) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
-                Text(text = extractCityAndCountry(alarm.label)  , color = Color.White, fontSize = 16.sp)
-                Text(text = alarm.hour.toString() + ":" + alarm.minute.toString(), color = Color.White, fontSize = 14.sp)
+            Box(
+                modifier = Modifier.width(300.dp),
+            ) {
+                Text(
+                    text = extractCityAndCountry(alarm.label),
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    overflow = TextOverflow.Ellipsis
+                )
+
             }
+                Text(text = alarm.hour.toString() + ":" + alarm.minute.toString(), color = Color.White, fontSize = 14.sp)
+           }
             Icon(Icons.Default.Notifications, contentDescription = "Alarm Icon", tint = Color.White)
         }
     }
 }
 
 fun extractCityAndCountry(address: String): String {
-    return address.split(", ")
-        .takeLast(3) // Get the last three parts (assuming they contain city and country)
-        .let { listOf(it.first(), it[1].split(" ").first(), it.last()) }
-        .joinToString(", ")
+    try {
+        return address.split(", ")
+            .takeLast(3) // Get the last three parts (assuming they contain city and country)
+            .let { listOf(it.first(), it[1].split(" ").first(), it.last()) }
+            .joinToString(", ")
+    }catch (
+        e: Exception
+    ){
+        return "Address not found"
+    }
 }
+
 @Preview
 @Composable
 private fun NoAlarmsFound() {

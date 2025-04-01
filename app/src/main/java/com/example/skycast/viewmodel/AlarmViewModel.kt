@@ -15,7 +15,7 @@ class AlarmViewModel(private val AlarmRepository: AlarmRepository) : ViewModel()
 
 
     val savedAlarms: Flow<List<AlarmEntity>> = AlarmRepository.getAllAlarms()
-    private var _selectedAlarmLocation = MutableStateFlow(Triple("",0.0,0.0))
+    var _selectedAlarmLocation = MutableStateFlow(Triple("",0.0,0.0))
     var selectedAlarmLocation = _selectedAlarmLocation.asStateFlow()
 
     fun insertAlarm(alarm: AlarmEntity) {

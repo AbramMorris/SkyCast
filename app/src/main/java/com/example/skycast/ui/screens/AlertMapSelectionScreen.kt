@@ -115,7 +115,6 @@ fun AlarmMapScreen(viewModel: WeatherViewModel, alarmViewModel: AlarmViewModel, 
                                 val cityName = selectedLocation!!.first
                                 val lat = selectedLocation!!.second
                                 val lng = selectedLocation!!.third
-
                                 navController.previousBackStackEntry
                                     ?.savedStateHandle
                                     ?.set("selectedCity", cityName)

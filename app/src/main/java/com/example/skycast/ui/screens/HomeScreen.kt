@@ -2,6 +2,7 @@ package com.example.skycast.ui.screens
 
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -35,6 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.skycast.data.models.WeatherDetailItem
@@ -54,11 +57,14 @@ import com.example.skycast.viewmodel.WeatherViewModelFactory
 import com.example.skycast.viewmodel.getDayNameFromDate
 import com.example.skycast.ui.theme.BlueBlackBack
 import com.example.skycast.util.DrawableUtils.getWeatherIcon
+import com.example.skycast.util.NetworkHelper
 import com.example.skycast.util.formatNumberBasedOnLanguage
 import com.example.skycast.util.formatTemperatureUnitBasedOnLanguage
+import com.example.skycast.util.getLocationMethod
 import com.example.skycast.util.getTemperatureUnit
+import com.example.skycast.util.getWindSpeedUnit
 import com.example.skycast.util.loadLanguagePreference
-import com.example.skycast.util.setUnitSymbol
+import com.example.skycast.util.shouldShowNetworkToast
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -77,34 +83,43 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
     val errorMessage by viewModel.errorMessage.collectAsState()
     val context = LocalContext.current
     val locationHelper = LocationHelper(context)
-    val tempUnit = getTemperatureUnit(context, "Temp") ?: "metric"
-    val windUnit = if (tempUnit == "imperial") "mph" else "m/s"
+    val windUnit = getWindSpeedUnit(context)
+    val locationMethod by viewModel.locationMethod.collectAsStateWithLifecycle()
+    val locationSetting =getLocationMethod(context)
 
-    LaunchedEffect(Unit) {
-        locationHelper.getFreshLocation { location ->
-            val lang = loadLanguagePreference(context)
-            val tempUnit = getTemperatureUnit(context, "Temp") ?: "metric"
-            if (location != null) {
-                viewModel.fetchWeather(location.latitude, location.longitude, lang, tempUnit, context)
-                viewModel.fetchWeatherForecast(location.latitude, location.longitude, lang, tempUnit, context)
-                Log.d("location", "language: $lang")
-
-//                Log.d("location", "HomeForecastScreen: $location")
-//                Log.d("weather", "HomeForecastScreen: ${forecastState?.list?.get(0)?.main?.temp}")
-//                Log.d("weather", "HomeScreen: ${weatherState?.main?.temp}")
-                Log.d("location", "lat${location.latitude}")
-                Log.d("location", "long${location.longitude}")
-
-            } else {
-                viewModel.fetchWeather(-0.13, 51.51, "en", "metric")
-                viewModel.fetchWeatherForecast(51.51, -0.13, "en", "metric")
-                Log.d("location", "HomeForecastScreen$location")
+    LaunchedEffect(locationSetting) {
+        if (locationSetting == "GPS") {
+            locationHelper.getFreshLocation { location ->
+                val lang = loadLanguagePreference(context)
+                val tempUnit = getTemperatureUnit(context, "Temp")
+                if (location != null) {
+                    viewModel.fetchWeather(location.latitude, location.longitude, lang, tempUnit, context)
+                    viewModel.fetchWeatherForecast(location.latitude, location.longitude, lang, tempUnit, context)
+                } else {
+                    viewModel.fetchWeather(-0.13, 51.51, "en", "metric")
+                    viewModel.fetchWeatherForecast(51.51, -0.13, "en", "metric")
+                }
             }
+        } else {
+            val tempUnit = getTemperatureUnit(context, "Temp")
+            val lang = loadLanguagePreference(context)
+            viewModel.fetchWeather(viewModel.getSavedHomeLocation(context).longitude, viewModel.getSavedHomeLocation(context).latitude, lang, tempUnit, context)
+            viewModel.fetchWeatherForecast( viewModel.getSavedHomeLocation(context).longitude,viewModel.getSavedHomeLocation(context).latitude, lang, tempUnit, context)
         }
     }
-    Log.d("weather", "HomeForecastScreen: ${weatherState?.name}")
 
+    if (NetworkHelper.isNetworkAvailable(context)) {
+        if (shouldShowNetworkToast(context)) {
+            Toast.makeText(context, "Network Available", Toast.LENGTH_SHORT).show()
+        }
+    } else {
+            Toast.makeText(
+                context,
+                stringResource(R.string.this_is_the_last_data_when_you_are_connected_to_the_internet),
+                Toast.LENGTH_SHORT
+            ).show()
 
+    }
 
     Box(
         modifier = Modifier
@@ -149,7 +164,9 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
                     Image(
                         painter = painterResource(id = getWeatherIcon(weather.weather.firstOrNull()?.main)),
                         contentDescription = stringResource(R.string.weather_icon),
-                        modifier = Modifier.size(150.dp).padding(top = 8.dp)
+                        modifier = Modifier
+                            .size(150.dp)
+                            .padding(top = 8.dp)
                     )
 
                     // Weather Description
@@ -181,11 +198,15 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
                         text = stringResource(R.string.today),
                         fontSize = 20.sp,
                         color = Color.White,
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 8.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp, vertical = 8.dp)
                     )
 
                     LazyRow(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         forecastState?.list?.let { hourlyForecast ->
@@ -200,7 +221,9 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
                         text = stringResource(R.string.weekly_forecast),
                         fontSize = 20.sp,
                         color = Color.White,
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 8.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp, vertical = 8.dp)
                     )
 
                     WeeklyForecast(forecastState)
@@ -251,17 +274,23 @@ fun WeeklyForecast(forecastState: WeatherForecastResponse?) {
             .take(5)
 
         Column(
-            modifier = Modifier.fillMaxWidth().padding(10.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
         ) {
             dailyAverages.forEachIndexed { _, (date, data) ->
                 val (avgTemp, iconRes) = data
                 val formattedTemp = formatNumberBasedOnLanguage(avgTemp.toString())
                 val formattedUnit = formatTemperatureUnitBasedOnLanguage(getTemperatureUnit(context, "Temp") ?: "C", getTemperatureUnit(context, "Lang") ?: "en")
                 Row(
-                    modifier = Modifier.fillMaxWidth().height(80.dp).padding(vertical = 10.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .padding(vertical = 10.dp)
                         .background(BlueBlackBack, shape = RoundedCornerShape(10.dp))
                         .padding(20.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text =  getDayNameFromDate(date),
@@ -284,13 +313,12 @@ fun WeeklyForecast(forecastState: WeatherForecastResponse?) {
     }
 }
 
-// Utility function to get weather icon based on conditions
-
 @Composable
 fun WeatherDetailsRow(weather: WeatherResponse, selectedLanguage: String, windUnit: String) {
     Box(
         modifier = Modifier
-            .fillMaxWidth()
+            .width(700.dp)
+            .height(150.dp)
             .padding(horizontal = 24.dp, vertical = 16.dp)
             .background(
                 BlueBlackBack,
@@ -299,8 +327,8 @@ fun WeatherDetailsRow(weather: WeatherResponse, selectedLanguage: String, windUn
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(100.dp)
+                .width(700.dp)
+                .height(150.dp)
                 .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -317,13 +345,13 @@ fun WeatherDetailsRow(weather: WeatherResponse, selectedLanguage: String, windUn
             )
             WeatherDetailItem(
                 icon = R.drawable.pressure,
-                value = formatNumberBasedOnLanguage("${weather.main.pressure}") + " hPa",
+                value = formatNumberBasedOnLanguage("${weather.main.pressure}") + stringResource(R.string.hpa),
                 label = stringResource(R.string.pressure)
             )
             WeatherDetailItem(
                 icon = R.drawable.cloudy,
-                value = formatNumberBasedOnLanguage("${weather.clouds}"),
-                label = stringResource(R.string.cloud)
+                value = formatNumberBasedOnLanguage("${weather.clouds.all}"),
+                label = stringResource(R.string.clouds)
             )
         }
     }

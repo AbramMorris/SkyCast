@@ -116,9 +116,7 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun MainNavigation() {
-
         val navController = rememberNavController()
-
         Scaffold(
             modifier = Modifier
                 .fillMaxSize(),

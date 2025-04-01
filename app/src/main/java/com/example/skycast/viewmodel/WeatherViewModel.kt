@@ -57,8 +57,6 @@ class WeatherViewModel(private val repository: WeatherRepository , private val h
 
     val isLoading = MutableStateFlow(false)
 
-
-
     fun fetchWeather( long :Double, lat :Double, lang: String ,unit :String)  {
         var newTemp =mapTemperatureUnit(unit)
         var newLang = setLanguage(lang)
@@ -170,7 +168,7 @@ fun fetchWeather(long: Double, lat: Double, lang: String, unit: String, context:
         viewModelScope.launch {
             _loading.value = true
             if (isInternetAvailable(context)) {
-                repository.getWeatherForecast(lat, lon, newTemp, newLang).collectLatest { result ->
+                repository.getWeatherForecast(lat, lon, newLang, newTemp).collectLatest { result ->
                     result.onSuccess {
                         _forecastState.value = it
                         cacheHomeData(null, it)
