@@ -2,6 +2,7 @@ package com.example.skycast.ui.screens
 
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -36,6 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.skycast.data.models.WeatherDetailItem
@@ -55,11 +57,14 @@ import com.example.skycast.viewmodel.WeatherViewModelFactory
 import com.example.skycast.viewmodel.getDayNameFromDate
 import com.example.skycast.ui.theme.BlueBlackBack
 import com.example.skycast.util.DrawableUtils.getWeatherIcon
+import com.example.skycast.util.NetworkHelper
 import com.example.skycast.util.formatNumberBasedOnLanguage
 import com.example.skycast.util.formatTemperatureUnitBasedOnLanguage
+import com.example.skycast.util.getLocationMethod
 import com.example.skycast.util.getTemperatureUnit
 import com.example.skycast.util.getWindSpeedUnit
 import com.example.skycast.util.loadLanguagePreference
+import com.example.skycast.util.shouldShowNetworkToast
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -78,35 +83,43 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
     val errorMessage by viewModel.errorMessage.collectAsState()
     val context = LocalContext.current
     val locationHelper = LocationHelper(context)
-    val tempUnit = getTemperatureUnit(context, "Temp")
     val windUnit = getWindSpeedUnit(context)
+    val locationMethod by viewModel.locationMethod.collectAsStateWithLifecycle()
+    val locationSetting =getLocationMethod(context)
 
-    LaunchedEffect(Unit) {
-        locationHelper.getFreshLocation { location ->
-            val lang = loadLanguagePreference(context)
-            val tempUnit = getTemperatureUnit(context, "Temp")
-            if (location != null) {
-                viewModel.fetchWeather(location.latitude, location.longitude, lang, tempUnit, context)
-                viewModel.fetchWeatherForecast(location.latitude, location.longitude, lang, tempUnit, context)
-                Log.d("location", "language: $lang")
-                Log.i("tempUnit", "HomeForecastScreen: $tempUnit")
-//                Log.d("location", "HomeForecastScreen: $location")
-//                Log.d("weather", "HomeForecastScreen: ${forecastState?.list?.get(0)?.main?.temp}")
-//                Log.d("weather", "HomeScreen: ${weatherState?.main?.temp}")
-                Log.d("location", "lat${location.latitude}")
-                Log.d("location", "long${location.longitude}")
-
-            } else {
-                viewModel.fetchWeather(-0.13, 51.51, "en", "metric")
-                viewModel.fetchWeatherForecast(51.51, -0.13, "en", "metric")
-                Log.d("location", "HomeForecastScreen$location")
-                Log.d("weather", "wether: ${forecastState?.list?.get(0)?.main?.temp}")
+    LaunchedEffect(locationSetting) {
+        if (locationSetting == "GPS") {
+            locationHelper.getFreshLocation { location ->
+                val lang = loadLanguagePreference(context)
+                val tempUnit = getTemperatureUnit(context, "Temp")
+                if (location != null) {
+                    viewModel.fetchWeather(location.latitude, location.longitude, lang, tempUnit, context)
+                    viewModel.fetchWeatherForecast(location.latitude, location.longitude, lang, tempUnit, context)
+                } else {
+                    viewModel.fetchWeather(-0.13, 51.51, "en", "metric")
+                    viewModel.fetchWeatherForecast(51.51, -0.13, "en", "metric")
+                }
             }
+        } else {
+            val tempUnit = getTemperatureUnit(context, "Temp")
+            val lang = loadLanguagePreference(context)
+            viewModel.fetchWeather(viewModel.getSavedHomeLocation(context).longitude, viewModel.getSavedHomeLocation(context).latitude, lang, tempUnit, context)
+            viewModel.fetchWeatherForecast( viewModel.getSavedHomeLocation(context).longitude,viewModel.getSavedHomeLocation(context).latitude, lang, tempUnit, context)
         }
     }
-    Log.d("weather", "HomeForecastScreen: ${weatherState?.name}")
 
+    if (NetworkHelper.isNetworkAvailable(context)) {
+        if (shouldShowNetworkToast(context)) {
+            Toast.makeText(context, "Network Available", Toast.LENGTH_SHORT).show()
+        }
+    } else {
+            Toast.makeText(
+                context,
+                stringResource(R.string.this_is_the_last_data_when_you_are_connected_to_the_internet),
+                Toast.LENGTH_SHORT
+            ).show()
 
+    }
 
     Box(
         modifier = Modifier
@@ -299,8 +312,6 @@ fun WeeklyForecast(forecastState: WeatherForecastResponse?) {
         }
     }
 }
-
-// Utility function to get weather icon based on conditions
 
 @Composable
 fun WeatherDetailsRow(weather: WeatherResponse, selectedLanguage: String, windUnit: String) {

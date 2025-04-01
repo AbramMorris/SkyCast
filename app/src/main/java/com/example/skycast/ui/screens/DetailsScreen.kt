@@ -38,8 +38,9 @@ import com.example.skycast.viewmodel.WeatherViewModel
 import com.example.skycast.util.formatNumberBasedOnLanguage
 import com.example.skycast.util.formatTemperatureUnitBasedOnLanguage
 import com.example.skycast.util.getTemperatureUnit
-
-
+import com.example.skycast.util.getWindSpeedUnit
+import com.example.skycast.util.loadLanguagePreference
+import com.example.skycast.util.setLangSymbol
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -52,15 +53,14 @@ fun DetailsScreen(
 ) {
     val context = LocalContext.current
     val tempUnit = getTemperatureUnit(context, "Temp") ?: "metric"
-    val windUnit = if (tempUnit == "imperial") "mph" else "m/s"
-
+    val windUnit = getWindSpeedUnit(context)
     val weatherState by viewModel.weatherState.collectAsState()
     val forecastState by viewModel.forecastState.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
 
     LaunchedEffect(latitude, longitude) {
-        val lang = getTemperatureUnit(context, "Lang") ?: "en"
+        val lang = loadLanguagePreference(context) ?: "en"
         viewModel.fetchWeather(latitude, longitude, lang, tempUnit)
         viewModel.fetchWeatherForecast(latitude, longitude, lang, tempUnit)
     }
