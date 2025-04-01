@@ -31,28 +31,30 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.skycast.R
 import com.example.skycast.data.enums.LanguageDisplay
-import com.example.skycast.data.enums.WindSpeed
+import com.example.skycast.ui.navigation.ScreenRoute
 import com.example.skycast.viewmodel.WeatherViewModel
 import com.example.skycast.ui.theme.BlueLight
+import com.example.skycast.util.getLocationMethod
 import com.example.skycast.util.getTemperatureUnit
 import com.example.skycast.util.getWindSpeedUnit
 import com.example.skycast.util.loadLanguagePreference
 import com.example.skycast.util.restartApp
 import com.example.skycast.util.saveLanguagePreference
+import com.example.skycast.util.saveLocationMethod
 import com.example.skycast.util.saveTemperatureUnit
 import com.example.skycast.util.saveWindSpeedUnit
 import com.example.skycast.util.setLangSymbol
 
 @Composable
 fun SettingsScreen( navController: NavController, viewModel: WeatherViewModel) {
+
     val context = LocalContext.current
-
-
     var selectedTemperature by remember { mutableStateOf("°C") }
     selectedTemperature = getTemperatureUnit(context, "Temp")
     var selectedWindSpeed by remember { mutableStateOf("m/s") }
     selectedWindSpeed = getWindSpeedUnit(context)
-    var selectedTheme by remember { mutableStateOf("System") }
+    var selectedLocator by remember { mutableStateOf("System") }
+    selectedLocator = getLocationMethod(context)
     var selectedLanguage by remember { mutableStateOf("en") }
     selectedLanguage = setLangSymbol(loadLanguagePreference(context))
     Log.d("save","new  $selectedLanguage")
@@ -135,15 +137,19 @@ fun SettingsScreen( navController: NavController, viewModel: WeatherViewModel) {
             }
             restartApp(context)
         }
-
-
         // Location
-        SettingSection(title = stringResource(R.string.location), options = listOf(stringResource(R.string.gps),
-            stringResource(R.string.map)
-        ), selectedOption = selectedTheme) {
-            selectedTheme = it
+        SettingSection(
+            title = stringResource(R.string.location),
+            options = listOf(stringResource(R.string.gps), stringResource(R.string.map)),
+            selectedOption = selectedLocator
+        ) {
+            selectedLocator = it
+            viewModel.setLocationMethod(it)
+            saveLocationMethod(context, it)
+            if (it == "Map") {
+                navController.navigate(ScreenRoute.SettingsMap.route)
+            }
         }
-
     }
 }
 

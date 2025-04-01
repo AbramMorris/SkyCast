@@ -29,10 +29,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.skycast.R
+import com.example.skycast.ui.screens.AlarmMapScreen
+import com.example.skycast.ui.screens.AlarmScreen
+import com.example.skycast.ui.screens.AlarmScreenUI
 import com.example.skycast.ui.screens.SettingsScreen
 import com.example.skycast.ui.theme.BlueLight
 import com.example.skycast.ui.screens.DetailsScreen
 import com.example.skycast.ui.screens.MapSelectionScreen
+import com.example.skycast.ui.screens.SettingMapScreen
 import com.example.skycast.viewmodel.AlarmViewModel
 
 
@@ -58,15 +62,10 @@ fun AppNavGraph(navController: NavHostController, viewModel: WeatherViewModel, a
                 )
             }
         }
-        composable(ScreenRoute.Alarm.route) {
-            com.example.skycast.ui.screens.AlarmScreen( navController,alarmViewModel)
-        }
-        composable(ScreenRoute.AlarmBottons.route) {
-            com.example.skycast.ui.screens.AlarmScreenUI( navController,alarmViewModel)
-        }
-        composable(ScreenRoute.AlarmMap.route) {
-            com.example.skycast.ui.screens.AlarmMapScreen(viewModel, alarmViewModel, navController)
-        }
+        composable(ScreenRoute.Alarm.route) { AlarmScreen( navController,alarmViewModel) }
+        composable(ScreenRoute.AlarmBottons.route) { AlarmScreenUI( navController,alarmViewModel) }
+        composable(ScreenRoute.AlarmMap.route) { AlarmMapScreen(viewModel, alarmViewModel, navController) }
+        composable(ScreenRoute.SettingsMap.route) { SettingMapScreen(viewModel, navController) }
     }
 }
 
