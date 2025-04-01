@@ -10,5 +10,6 @@ sealed class ScreenRoute(val route: String) {
     object Alarm : ScreenRoute("alarm")
     object AlarmBottons : ScreenRoute("alarm_buttons")
     object AlarmMap : ScreenRoute("alarm_map")
+    object SettingsMap : ScreenRoute("settings_map")
 }
 
