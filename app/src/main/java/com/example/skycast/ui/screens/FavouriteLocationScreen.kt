@@ -31,6 +31,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -59,6 +60,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.skycast.R
+import com.example.skycast.data.models.Response
 import com.example.skycast.data.models.SavedLocation
 import com.example.skycast.viewmodel.WeatherViewModel
 import com.example.skycast.ui.theme.BlueLight
@@ -217,8 +219,6 @@ fun MapSelectionScreen(viewModel: WeatherViewModel, navController: NavController
         position = CameraPosition.fromLatLngZoom(LatLng(20.0, 0.0), 3f) // Default world view
     }
     var loc : MutableState<LatLng> = remember { mutableStateOf(LatLng( 0.0,0.0 )) }
-//    val currentPojo : List<WeatherResponse> = viewModel.fetchWeather(loc.value.longitude,loc.value.latitude,"en","metric").toList()
-//    val forcastPojo = viewModel.fetchWeatherForecast(loc.value.latitude,loc.value.longitude,"en","metric").toList()
 
     val addreess = remember { mutableStateOf("") }
     LaunchedEffect(selectedLocation) {
@@ -303,10 +303,6 @@ fun Map(address: MutableState<String>, latLng: MutableState<LatLng>, viewModel: 
     val placesClient = Places.createClient(context)
     var searchText by remember { mutableStateOf("") }
     var predictions by remember { mutableStateOf(emptyList<AutocompletePrediction>()) }
-    val currentPojo  = viewModel.fetchWeather(latLng.value.longitude,latLng.value.latitude,"en","metric")
-    val forecastPojo = viewModel.fetchWeatherForecast(latLng.value.latitude,latLng.value.longitude,"en","metric")
-//    val pojo = SavedLocation("",0.0,0.0, currentPojo, forecastPojo )
-
 
     LaunchedEffect(searchText) {
             val response = placesClient.awaitFindAutocompletePredictions {
