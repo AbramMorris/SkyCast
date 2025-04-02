@@ -376,12 +376,12 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
 
     LaunchedEffect(locationSetting) {
 
-//        if (notificationLatitude != -1.0 && notificationLongitude != -1.0) {
-//            val lang = loadLanguagePreference(context)
-//            val tempUnit = getTemperatureUnit(context, "Temp")
-//            viewModel.fetchWeather(notificationLongitude, notificationLatitude, lang, tempUnit, context)
-//            viewModel.fetchWeatherForecast(notificationLongitude, notificationLatitude, lang, tempUnit, context)
-//        }
+        if (notificationLatitude != -1.0 && notificationLongitude != -1.0) {
+            val lang = loadLanguagePreference(context)
+            val tempUnit = getTemperatureUnit(context, "Temp")
+            viewModel.fetchWeather(notificationLongitude, notificationLatitude, lang, tempUnit, context)
+            viewModel.fetchWeatherForecast(notificationLongitude, notificationLatitude, lang, tempUnit, context)
+        }
         if (locationSetting == "GPS") {
             LocationHelper(context).getFreshLocation { location ->
                 val lang = loadLanguagePreference(context)
