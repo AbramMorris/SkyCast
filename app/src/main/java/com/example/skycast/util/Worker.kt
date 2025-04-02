@@ -34,7 +34,7 @@ class AlarmWorker(
             val localDataSource = LocalDataSource(AppDatabase.getDatabase(applicationContext).locationDao())
             val repository = WeatherRepositoryImpl(remoteDataSource, localDataSource)
 //            val viewModel = ViewModelProvider(this).get(AlarmViewModel::class.java)
-            val tempUnit = getTemperatureUnit(applicationContext, "Temp") ?: "metric"
+            val tempUnit ="metric"
             val lang = getTemperatureUnit(applicationContext, "Lang") ?: "en"
             val AlarmRepository = AlarmRepoImp(AlarmLocalDataSource(AppDatabase.getDatabase(applicationContext).alarmDao()) )
             val alarm = AlarmViewModel(AlarmRepository).savedAlarms.firstOrNull()?.lastOrNull()

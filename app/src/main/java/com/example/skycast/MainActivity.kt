@@ -11,15 +11,27 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -33,6 +45,7 @@ import com.example.skycast.ui.navigation.AppNavGraph
 import com.example.skycast.ui.navigation.ScreenRoute
 import com.example.skycast.ui.navigation.navBar
 import com.example.skycast.util.LocationHelper
+import com.example.skycast.util.NetworkHelper
 import com.example.skycast.util.REQUEST_LOCATION_PERMISSION
 import com.example.skycast.util.loadLanguagePreference
 import com.example.skycast.viewmodel.AlarmViewModel
@@ -122,6 +135,13 @@ class MainActivity : ComponentActivity() {
     fun MainNavigation(notificationLatitude: Double,
                        notificationLongitude: Double) {
         val navController = rememberNavController()
+        val context = LocalContext.current
+//        val isNetworkAvailable = remember { mutableStateOf(true) }
+
+
+//        LaunchedEffect(Unit) {
+//            isNetworkAvailable.value = NetworkHelper.isNetworkAvailable(context)
+//        }
         Scaffold(
             modifier = Modifier
                 .fillMaxSize(),
@@ -133,6 +153,22 @@ class MainActivity : ComponentActivity() {
                 if (currentRoute != ScreenRoute.Splash.route){
                 navBar(navController)
                 }
+            },
+            topBar = {
+//                if (!isNetworkAvailable.value) {
+//                    Box(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .background(Color.Red),
+//                        contentAlignment = Alignment.Center
+//                    ) {
+//                        Text(
+//                            text = stringResource(R.string.no_internet_connection),
+//                            color = Color.White,
+//                            modifier = Modifier.padding(8.dp)
+//                        )
+//                    }
+//                }
             }
         ) { paddingValues ->
             Box(modifier = Modifier.padding(paddingValues)) {
@@ -149,23 +185,5 @@ class MainActivity : ComponentActivity() {
         config.setLocale(locale)
         resources.updateConfiguration(config, resources.displayMetrics)
     }
-
-//    override fun onNewIntent(intent: Intent) {
-//        super.onNewIntent(intent)
-//        handleNotificationIntent(intent)
-//    }
-//
-//    private fun handleNotificationIntent(intent: Intent?,) {
-//        if (intent?.getBooleanExtra("from_notification", false) == true) {
-//            val lat = intent.getDoubleExtra("latitude", -1.0)
-//            val lng = intent.getDoubleExtra("longitude", -1.0)
-//
-//            if (lat != -1.0 && lng != -1.0) {
-//                navController.navigate("${ScreenRoute.Home.route}?lat=$lat&lng=$lng") {
-//                    popUpTo(ScreenRoute.Home.route) { inclusive = true }
-//                }
-//            }
-//        }
-//    }
 
 }

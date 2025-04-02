@@ -44,6 +44,8 @@
             <intent-filter>
                 <action
                     android:name="com.example.skycast.ALARM_ACTION" />
+                <action
+                    android:name="SNOOZE_ALARM"/>
             </intent-filter>
         </receiver>
         <receiver android:name=".data.alarm.BootReceiver"
