@@ -44,11 +44,15 @@ import kotlinx.coroutines.launch
 
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AlarmScreen(navController: NavHostController, viewModel: AlarmViewModel) {
     val alarms by viewModel.savedAlarms.collectAsState(initial = emptyList())
     val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+
 
     Scaffold(
         floatingActionButton = {
@@ -58,6 +62,9 @@ fun AlarmScreen(navController: NavHostController, viewModel: AlarmViewModel) {
             ) {
                 Icon(imageVector = Icons.Default.Notifications, contentDescription = "Add", tint = BlueLight)
             }
+        },
+                snackbarHost = {
+            SnackbarHost(snackbarHostState)
         }
     ) { paddingValues ->
         Box(
@@ -91,11 +98,53 @@ fun AlarmScreen(navController: NavHostController, viewModel: AlarmViewModel) {
                         modifier = Modifier.fillMaxSize()
                     ) {
                         items(alarms, key = { it.id }) { alarm ->
-                            SwipeToDeleteAlarm(
-                                alarm = alarm,
-                                viewModel = viewModel,
-                                coroutineScope = coroutineScope
-                            )
+                                val dismissState = rememberDismissState(
+                                    confirmStateChange = {
+                                        if (it == DismissValue.DismissedToStart || it == DismissValue.DismissedToEnd) {
+                                            coroutineScope.launch {
+                                                viewModel.deleteAlarm(alarm)
+                                                cancelAlarm(context, alarm.id)
+                                                cancelAlarmWorker(context, alarm.id)
+                                                val result = snackbarHostState.showSnackbar(
+                                                    message = context.getString(R.string.alarm_deleted),
+                                                    actionLabel = context.getString(R.string.undo),
+                                                    duration = androidx.compose.material3.SnackbarDuration.Short
+                                                )
+                                                if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
+                                                    viewModel.insertAlarm(alarm)
+                                                }
+                                            }
+                                        }
+                                        true
+                                    }
+                                )
+
+                                SwipeToDismiss(
+                                    state = dismissState,
+                                    directions = setOf(DismissDirection.StartToEnd, DismissDirection.EndToStart),
+                                    background = {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .padding(8.dp)
+                                                .background(
+                                                    Color.Red,
+                                                    shape = RoundedCornerShape(12.dp)
+                                                )
+                                                .padding(16.dp),
+                                            contentAlignment = Alignment.CenterStart
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Delete,
+                                                contentDescription = "Delete",
+                                                tint = Color.White
+                                            )
+                                        }
+                                    },
+                                    dismissContent = {
+                                        AlarmItem(alarm)
+                                    }
+                                )
                         }
                     }
                 }
@@ -103,52 +152,58 @@ fun AlarmScreen(navController: NavHostController, viewModel: AlarmViewModel) {
         }
     }
 }
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-fun SwipeToDeleteAlarm(
-    alarm: AlarmEntity,
-    viewModel: AlarmViewModel,
-    coroutineScope: CoroutineScope
-) {
-    val context = LocalContext.current
-    val dismissState = rememberDismissState(
-        confirmStateChange = {
-            if (it == DismissValue.DismissedToStart || it == DismissValue.DismissedToEnd) {
-                coroutineScope.launch {
-                    viewModel.deleteAlarm(alarm)
-                    cancelAlarm(context, alarm.id)
-                    cancelAlarmWorker(context, alarm.id)
-                }
-            }
-            true
-        }
-    )
-
-    SwipeToDismiss(
-        state = dismissState,
-        directions = setOf(DismissDirection.StartToEnd, DismissDirection.EndToStart),
-        background = {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(8.dp)
-                    .background(Color.Red, shape = RoundedCornerShape(12.dp))
-                    .padding(16.dp),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete",
-                    tint = Color.White
-                )
-            }
-        },
-        dismissContent = {
-            AlarmItem(alarm)
-        }
-    )
-}
+//
+//@OptIn(ExperimentalMaterialApi::class)
+//@Composable
+//fun SwipeToDeleteAlarm(
+//    alarm: AlarmEntity,
+//    viewModel: AlarmViewModel,
+//    coroutineScope: CoroutineScope
+//) {
+//
+//    val context = LocalContext.current
+//    val dismissState = rememberDismissState(
+//        confirmStateChange = {
+//            if (it == DismissValue.DismissedToStart || it == DismissValue.DismissedToEnd) {
+//                coroutineScope.launch {
+//                    viewModel.deleteAlarm(alarm)
+//                    cancelAlarm(context, alarm.id)
+//                    cancelAlarmWorker(context, alarm.id)
+//                }
+//                val result = snackbarHostState.showSnackbar(
+//                    message = context.getString(R.string.location_deleted),
+//                    actionLabel = context.getString(R.string.undo),
+//                    duration = androidx.compose.material3.SnackbarDuration.Short
+//                )
+//            }
+//            true
+//        }
+//    )
+//
+//    SwipeToDismiss(
+//        state = dismissState,
+//        directions = setOf(DismissDirection.StartToEnd, DismissDirection.EndToStart),
+//        background = {
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .padding(8.dp)
+//                    .background(Color.Red, shape = RoundedCornerShape(12.dp))
+//                    .padding(16.dp),
+//                contentAlignment = Alignment.CenterStart
+//            ) {
+//                Icon(
+//                    imageVector = Icons.Default.Delete,
+//                    contentDescription = "Delete",
+//                    tint = Color.White
+//                )
+//            }
+//        },
+//        dismissContent = {
+//            AlarmItem(alarm)
+//        }
+//    )
+//}
 
 @Composable
 fun AlarmItem(alarm: AlarmEntity) {
