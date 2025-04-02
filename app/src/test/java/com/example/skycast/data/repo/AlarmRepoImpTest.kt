@@ -23,7 +23,7 @@ class AlarmRepoImpTest {
         alarmRepo = AlarmRepoImp(localDataSource)
     }
     @Test
-    fun `test insertAlarm calls localDataSource insertAlarm`() = runTest {
+    fun test_insertAlarm_calls_localDataSource_insertAlarm_() = runTest {
         // Arrange
         val alarm = AlarmEntity(1, 12, 22, "alarm", 0.0, 0.0)
         // Mock the insertAlarm function so it does nothing
@@ -34,7 +34,7 @@ class AlarmRepoImpTest {
         coVerify { localDataSource.insertAlarm(alarm) } // Verify that insertAlarm was called
     }
     @Test
-    fun `test deleteAlarm calls localDataSource deleteAlarm`() = runTest {
+    fun test_deleteAlarm_calls_localDataSource_deleteAlarm() = runTest {
         // Arrange
         val alarm = AlarmEntity(1, 12, 22, "alarm", 0.0, 0.0)
         // Mock the deleteAlarm function so it does nothing

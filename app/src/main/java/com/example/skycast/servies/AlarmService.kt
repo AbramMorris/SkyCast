@@ -94,6 +94,7 @@ class AlarmService : Service(), TextToSpeech.OnInitListener {
 
     private fun createNotification(contentText: String, latitude: Double, longitude: Double,id:Int): Notification {
         val stopIntent = Intent(stopAction).apply { setPackage(packageName) }
+
         val stopPendingIntent = PendingIntent.getBroadcast(
             this, 0, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -101,6 +102,7 @@ class AlarmService : Service(), TextToSpeech.OnInitListener {
             putExtra("alarm_id", id)
             setPackage(packageName)
         }
+
         val snoozePendingIntent = PendingIntent.getBroadcast(
             this,
             id + 2000,
@@ -128,6 +130,7 @@ class AlarmService : Service(), TextToSpeech.OnInitListener {
             .addAction(R.drawable.reject, getString(R.string.cancel_alarm), stopPendingIntent)
             .addAction(R.drawable.snooze, "Snooze ", snoozePendingIntent) // Snooze button
             .setContentIntent(homePendingIntent) // Set the click action to navigate to Home screen
+            .setAutoCancel(true)
             .build()
     }
 

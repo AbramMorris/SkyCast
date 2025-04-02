@@ -69,6 +69,7 @@ object AlarmScheduler {
     private const val SNOOZE_DURATION_MS = 5000L // 5 seconds
 
     fun scheduleSnooze(context: Context, alarmId: Int, originalIntent: Intent) {
+        cancelAlarm(context, alarmId)
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         // Create new intent with original extras
@@ -84,6 +85,7 @@ object AlarmScheduler {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+
         val triggerTime = System.currentTimeMillis() + SNOOZE_DURATION_MS
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -93,33 +95,35 @@ object AlarmScheduler {
                 pendingIntent
             )
         }
+
     }
 
     private fun generateSnoozeRequestCode(alarmId: Int): Int {
         // Generate unique request code that won't conflict with original alarms
         return alarmId + 10000
     }
-    fun cancelAlarm(context: Context, alarm: AlarmEntity) {
+
+    fun cancelAlarm(context: Context, alarmId:Int ) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val uniqueId = "alarm_${alarm.id}"
+        val uniqueId = "alarm_${alarmId}"
         // Create the exact same PendingIntent used when scheduling the alarm
         val intent = Intent(context, AlarmReceiver::class.java)
         val pendingIntent = PendingIntent.getBroadcast(
-            context, alarm.id, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            context,alarmId, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         // Cancel AlarmManager alarm
         alarmManager.cancel(pendingIntent)
         pendingIntent.cancel()
-        Log.d("AlarmScheduler", "AlarmManager canceled for ID ${alarm.id}")
+        Log.d("AlarmScheduler", "AlarmManager canceled for ID ${alarmId}")
         // Stop the service when the alarm is deleted
         val stopIntent = Intent(context, AlarmReceiver::class.java).apply {
             action = "STOP_ALARM_SERVICE"
-            Log.d("AlarmScheduler", "Stopping service for ID $alarm.id")
+            Log.d("AlarmScheduler", "Stopping service for ID ${alarmId}")
         }
         context.sendBroadcast(stopIntent)
         // Cancel WorkManager task (Make sure you set the tag when scheduling)
-        deleteScheduledAlarm(context, alarm.id)
-        Log.d("AlarmScheduler", "WorkManager task canceled for ID $alarm.id")
+        deleteScheduledAlarm(context, alarmId)
+        Log.d("AlarmScheduler", "WorkManager task canceled for ID $alarmId")
     }
     @SuppressLint("SuspiciousIndentation")
     fun deleteScheduledAlarm(context: Context, alarmId: Int ) {
