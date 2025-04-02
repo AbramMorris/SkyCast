@@ -25,7 +25,6 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 
-
 class AlarmService : Service(), TextToSpeech.OnInitListener {
     private var tts: TextToSpeech? = null
     private var isTtsInitialized = false
@@ -46,11 +45,15 @@ class AlarmService : Service(), TextToSpeech.OnInitListener {
                     message = "Weather: $description,\nTemperature: ${temperature}°$tempUnit,\nHumidity: $humidity%."
                     Log.d("AlarmService", "Updated Message: $message")
 
-                    // Assuming you fetch the latitude and longitude from the database here
-                    val latitude = 40.7128 // Replace with actual latitude from DB
-                    val longitude = -74.0060 // Replace with actual longitude from DB
+                    CoroutineScope(Dispatchers.IO).launch {
+                        val coordinates = fetchNotData()
+                        val latitude = coordinates?.first ?: 40.7128  // Default if null
+                        val longitude = coordinates?.second ?: -74.0060  // Default if null
+                        val alarmId = coordinates?.third ?: 0
+                        updateNotification(message, latitude, longitude,alarmId)
+                    }
 
-                    updateNotification(message, latitude, longitude)
+
                     playNotificationSound()
                 }
                 stopAction -> {
@@ -67,15 +70,16 @@ class AlarmService : Service(), TextToSpeech.OnInitListener {
             addAction("com.example.weathersync.ALARM_TRIGGER")
             addAction(stopAction)
         }
+
         registerReceiver(broadcastReceiver, filter)
         createNotificationChannel()
         CoroutineScope(Dispatchers.IO).launch {
             val coordinates = fetchNotData()
             val latitude = coordinates?.first ?: 40.7128  // Default if null
             val longitude = coordinates?.second ?: -74.0060  // Default if null
+            val alarmId = coordinates?.third ?: 0
 
-            // Start foreground service with correct location
-            startForeground(notificationId, createNotification(message, latitude, longitude))
+            startForeground(notificationId, createNotification(message, latitude, longitude,alarmId))
 
             fetchWeatherData()
         }
@@ -88,11 +92,22 @@ class AlarmService : Service(), TextToSpeech.OnInitListener {
         WorkManager.getInstance(applicationContext).enqueue(workRequest)
     }
 
-    private fun createNotification(contentText: String, latitude: Double, longitude: Double): Notification {
+    private fun createNotification(contentText: String, latitude: Double, longitude: Double,id:Int): Notification {
         val stopIntent = Intent(stopAction).apply { setPackage(packageName) }
         val stopPendingIntent = PendingIntent.getBroadcast(
             this, 0, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
+        val snoozeIntent = Intent("SNOOZE_ALARM").apply {
+            putExtra("alarm_id", id)
+            setPackage(packageName)
+        }
+        val snoozePendingIntent = PendingIntent.getBroadcast(
+            this,
+            id + 2000,
+            snoozeIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
 
         // Create an Intent to open the Home screen and pass latitude and longitude
         val homeIntent = Intent(this, MainActivity::class.java).apply {
@@ -110,14 +125,15 @@ class AlarmService : Service(), TextToSpeech.OnInitListener {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setOngoing(true)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message ?: "Weather alert dismissed"))
-            .addAction(R.drawable.reject, getString(R.string.cancel_alarm), stopPendingIntent) // Cancel button
+            .addAction(R.drawable.reject, getString(R.string.cancel_alarm), stopPendingIntent)
+            .addAction(R.drawable.snooze, "Snooze ", snoozePendingIntent) // Snooze button
             .setContentIntent(homePendingIntent) // Set the click action to navigate to Home screen
             .build()
     }
 
-    private fun updateNotification(contentText: String, latitude: Double, longitude: Double) {
+    private fun updateNotification(contentText: String, latitude: Double, longitude: Double,id:Int) {
         val manager = getSystemService(NotificationManager::class.java)
-        val notification = createNotification(contentText, latitude, longitude)
+        val notification = createNotification(contentText, latitude, longitude, id)
         manager.notify(notificationId, notification)
     }
 
@@ -153,12 +169,11 @@ class AlarmService : Service(), TextToSpeech.OnInitListener {
             isTtsInitialized = true
         }
     }
-    private suspend fun fetchNotData(): Pair<Double, Double>? {
+    private suspend fun fetchNotData(): Triple<Double, Double,Int>? {
         val repo = AlarmRepoImp(AlarmLocalDataSource(AppDatabase.getDatabase(applicationContext).alarmDao()))
-        val result = repo.getAllAlarms().firstOrNull() // Collects the first emitted list safely
-
+        val result = repo.getAllAlarms().firstOrNull()
         return result?.firstOrNull()?.let { alarm ->
-            Pair(alarm.latitude, alarm.longitude)
+            Triple(alarm.latitude, alarm.longitude,alarm.id)
         }
     }
 

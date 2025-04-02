@@ -5,6 +5,8 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
+import android.os.Bundle
 import android.util.Log
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
@@ -63,6 +65,39 @@ object AlarmScheduler {
             pendingIntent
         )
 //        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+    }
+    private const val SNOOZE_DURATION_MS = 5000L // 5 seconds
+
+    fun scheduleSnooze(context: Context, alarmId: Int, originalIntent: Intent) {
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        // Create new intent with original extras
+        val snoozeIntent = Intent(context, AlarmReceiver::class.java).apply {
+            action = originalIntent.action // Preserve original action
+            putExtras(originalIntent.extras ?: Bundle()) // Carry all original extras
+        }
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            generateSnoozeRequestCode(alarmId), // Unique request code
+            snoozeIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val triggerTime = System.currentTimeMillis() + SNOOZE_DURATION_MS
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                triggerTime,
+                pendingIntent
+            )
+        }
+    }
+
+    private fun generateSnoozeRequestCode(alarmId: Int): Int {
+        // Generate unique request code that won't conflict with original alarms
+        return alarmId + 10000
     }
     fun cancelAlarm(context: Context, alarm: AlarmEntity) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
