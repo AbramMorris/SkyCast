@@ -42,6 +42,9 @@
     <string name="clouds">سحب</string>
     <string name="this_is_the_last_data_when_you_are_connected_to_the_internet"> هذة اخر معلومات محفوظة عندما كنت متصل بالانترنت</string>
     <string name="no_favourite_locations">لا توجد مواقع مفضلة</string>
+    <string name="no_internet_connection">لا يوجد اتصال بالإنترنت</string>
+    <string name="alarm_deleted">تم حذف المنبه</string>
+
 
 
 
