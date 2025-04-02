@@ -35,6 +35,19 @@ android {
             )
         }
     }
+   
+        packagingOptions {
+            resources {
+                excludes += "META-INF/LICENSE-notice.md"
+                excludes += "META-INF/LICENSE.md"
+                excludes += "META-INF/LICENSE.txt"
+                excludes += "META-INF/DEPENDENCIES"
+                excludes += "META-INF/AL2.0"
+                excludes += "META-INF/LGPL2.1"
+            }
+        }
+
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -93,8 +106,6 @@ dependencies {
     ksp("androidx.room:room-compiler:$room_version")
 // optional - Kotlin Extensions and Coroutines support for Room
     implementation("androidx.room:room-ktx:$room_version")
-//Glide
-    implementation ("com.github.bumptech.glide:compose:1.0.0-beta01")
 //LiveData & Compose
     val compose_version = "1.0.0"
     implementation ("androidx.compose.runtime:runtime-livedata:$compose_version")
@@ -161,10 +172,6 @@ dependencies {
     // hamcrest
     testImplementation ("org.hamcrest:hamcrest:2.2")
     testImplementation ("org.hamcrest:hamcrest-library:2.2")
-    androidTestImplementation ("org.hamcrest:hamcrest:2.2")
-    androidTestImplementation ("org.hamcrest:hamcrest-library:2.2")
-
-
     // AndroidX and Robolectric
     testImplementation ("androidx.test.ext:junit-ktx:$androidXTestExtKotlinRunnerVersion")
     testImplementation ("androidx.test:core-ktx:$androidXTestCoreVersion")
@@ -177,7 +184,6 @@ dependencies {
     //kotlinx-coroutines
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion")
     testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
-    androidTestImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
     testImplementation("io.mockk:mockk-android:1.13.17")
     testImplementation("io.mockk:mockk-agent:1.13.17")
     androidTestImplementation ("androidx.arch.core:core-testing:$archTestingVersion")
