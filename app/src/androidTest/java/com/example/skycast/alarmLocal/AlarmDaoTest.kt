@@ -35,7 +35,7 @@ class AlarmDaoTest {
         database.close()
     }
     @Test
-    fun insertTaskAndGetTaskFromBothDataSourceAndDao() = runTest {
+    fun insertAlarmAndGetAlarmFromDao() = runTest {
         // Arrange: Create an alarm entity
         val alarm = AlarmEntity(1, 2, 50, "alaaarm", 22.555, 33.6677)
 
@@ -51,7 +51,7 @@ class AlarmDaoTest {
         MatcherAssert.assertThat(result[0].latitude, `is`(22.555)) // Validate latitude
     }
     @Test
-    fun insertAlert_DeletethisItem_checkisTheListHaveTheAlertOrNot() = runBlocking {
+    fun insertAlarm_DeletethisAlarm_checkisTheListHaveTheAlertOrNot() = runBlocking {
         // Arrange: Create an alarm entity
         val alarm = AlarmEntity(1, 2, 50, "alaaarm", 22.555, 33.6677)
 
