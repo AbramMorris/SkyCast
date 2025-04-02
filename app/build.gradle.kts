@@ -181,6 +181,10 @@ dependencies {
     testImplementation("io.mockk:mockk-android:1.13.17")
     testImplementation("io.mockk:mockk-agent:1.13.17")
     androidTestImplementation ("androidx.arch.core:core-testing:$archTestingVersion")
+    androidTestImplementation ("io.mockk:mockk-android:1.13.17")
+    androidTestImplementation ("io.mockk:mockk-agent:1.13.17")
+    testImplementation("io.mockk:mockk-android:1.13.17")
+    testImplementation("io.mockk:mockk-agent:1.13.17")
 
 
 

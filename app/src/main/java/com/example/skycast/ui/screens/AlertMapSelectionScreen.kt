@@ -124,7 +124,7 @@ fun AlarmMapScreen(viewModel: WeatherViewModel, alarmViewModel: AlarmViewModel, 
                                 navController.previousBackStackEntry
                                     ?.savedStateHandle
                                     ?.set("selectedLng", lng)
-
+                                viewModel.updateSelectedLocation(cityName, lat, lng)
                                 navController.popBackStack()
                             }
                         },

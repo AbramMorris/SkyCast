@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -200,11 +201,14 @@ fun LocationItem(location: SavedLocation, onClick: () -> Unit, navController: Na
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Column {
-            Text(location.name, color = Color.White, fontSize = 18.sp)
-//            Text("Lat: ${location.latitude}, Lng: ${location.longitude}", color = Color.White)
+        Box(
+            modifier = Modifier.width(300.dp),
+        ){
+            Column {
+                Text(location.name, color = Color.White, fontSize = 18.sp)
+            }
         }
-        Icon(imageVector = Icons.Default.LocationOn, contentDescription = stringResource(R.string.location_icon), tint = Color.White)
+        Icon(imageVector = Icons.Default.LocationOn, contentDescription = stringResource(R.string.location_icon), tint = Color.White , modifier = Modifier.size(30.dp))
     }
 }
 

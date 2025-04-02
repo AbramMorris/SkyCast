@@ -45,7 +45,6 @@ class WeatherViewModel(
     private val homeCacheRepo: HomeCacheRepo
 ) : ViewModel() {
 
-    // States using Response sealed class
     private val _weatherState = MutableStateFlow<Response<WeatherResponse>>(Response.Loading)
     val weatherState: StateFlow<Response<WeatherResponse>> = _weatherState.asStateFlow()
 

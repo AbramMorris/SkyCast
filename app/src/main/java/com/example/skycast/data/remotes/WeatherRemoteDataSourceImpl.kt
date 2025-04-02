@@ -6,7 +6,7 @@ import com.example.skycast.data.models.WeatherResponse
 import retrofit2.Response
 
 class WeatherRemoteDataSourceImpl(private val apiService: WeatherApiServes) :
-    WeatherRemoteDataSource {
+    WeatherRemoteDataSourcee {
     override suspend fun getCurrentWeather( latitude: Double, longitude: Double, lang: String,unit :String): Response<WeatherResponse> {
         Log.i("unit","unit = $unit")
         return apiService.getWeather(latitude, longitude, lang ,unit )
