@@ -108,9 +108,9 @@ fun AlarmScreen(navController: NavHostController, viewModel: AlarmViewModel) {
                                                 val result = snackbarHostState.showSnackbar(
                                                     message = context.getString(R.string.alarm_deleted),
                                                     actionLabel = context.getString(R.string.undo),
-                                                    duration = androidx.compose.material3.SnackbarDuration.Short
+                                                    duration = SnackbarDuration.Short
                                                 )
-                                                if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
+                                                if (result == SnackbarResult.ActionPerformed) {
                                                     viewModel.insertAlarm(alarm)
                                                 }
                                             }
@@ -152,58 +152,7 @@ fun AlarmScreen(navController: NavHostController, viewModel: AlarmViewModel) {
         }
     }
 }
-//
-//@OptIn(ExperimentalMaterialApi::class)
-//@Composable
-//fun SwipeToDeleteAlarm(
-//    alarm: AlarmEntity,
-//    viewModel: AlarmViewModel,
-//    coroutineScope: CoroutineScope
-//) {
-//
-//    val context = LocalContext.current
-//    val dismissState = rememberDismissState(
-//        confirmStateChange = {
-//            if (it == DismissValue.DismissedToStart || it == DismissValue.DismissedToEnd) {
-//                coroutineScope.launch {
-//                    viewModel.deleteAlarm(alarm)
-//                    cancelAlarm(context, alarm.id)
-//                    cancelAlarmWorker(context, alarm.id)
-//                }
-//                val result = snackbarHostState.showSnackbar(
-//                    message = context.getString(R.string.location_deleted),
-//                    actionLabel = context.getString(R.string.undo),
-//                    duration = androidx.compose.material3.SnackbarDuration.Short
-//                )
-//            }
-//            true
-//        }
-//    )
-//
-//    SwipeToDismiss(
-//        state = dismissState,
-//        directions = setOf(DismissDirection.StartToEnd, DismissDirection.EndToStart),
-//        background = {
-//            Box(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .padding(8.dp)
-//                    .background(Color.Red, shape = RoundedCornerShape(12.dp))
-//                    .padding(16.dp),
-//                contentAlignment = Alignment.CenterStart
-//            ) {
-//                Icon(
-//                    imageVector = Icons.Default.Delete,
-//                    contentDescription = "Delete",
-//                    tint = Color.White
-//                )
-//            }
-//        },
-//        dismissContent = {
-//            AlarmItem(alarm)
-//        }
-//    )
-//}
+
 
 @Composable
 fun AlarmItem(alarm: AlarmEntity) {
