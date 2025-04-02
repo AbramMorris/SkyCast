@@ -4,6 +4,7 @@ package com.example.skycast.util
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import androidx.lifecycle.ViewModelProvider
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.skycast.data.database.AlarmDataBase.AlarmLocalDataSource
@@ -32,6 +33,7 @@ class AlarmWorker(
             val remoteDataSource = WeatherRemoteDataSourceImpl(apiService)
             val localDataSource = LocalDataSource(AppDatabase.getDatabase(applicationContext).locationDao())
             val repository = WeatherRepositoryImpl(remoteDataSource, localDataSource)
+//            val viewModel = ViewModelProvider(this).get(AlarmViewModel::class.java)
             val tempUnit = getTemperatureUnit(applicationContext, "Temp") ?: "metric"
             val lang = getTemperatureUnit(applicationContext, "Lang") ?: "en"
             val AlarmRepository = AlarmRepoImp(AlarmLocalDataSource(AppDatabase.getDatabase(applicationContext).alarmDao()) )
