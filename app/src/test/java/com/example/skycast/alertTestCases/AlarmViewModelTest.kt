@@ -5,7 +5,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.skycast.data.models.AlarmEntity
 import com.example.skycast.getOrAwaitValue
 import com.example.skycast.viewmodel.AlarmViewModel
-import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.not
