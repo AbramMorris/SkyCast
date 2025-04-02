@@ -8,6 +8,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.skycast.viewmodel.AlarmViewModel
 import android.os.Build
+import android.widget.Toast
 import androidx.compose.material3.Text
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -38,8 +39,8 @@ import com.example.skycast.data.models.AlarmEntity
 import com.example.skycast.ui.navigation.ScreenRoute
 import com.example.skycast.ui.theme.BlueLight
 import com.example.skycast.util.AlarmScheduler.cancelAlarm
+import com.example.skycast.util.NetworkHelper
 import com.example.skycast.util.cancelAlarmWorker
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
@@ -57,7 +58,13 @@ fun AlarmScreen(navController: NavHostController, viewModel: AlarmViewModel) {
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate(ScreenRoute.AlarmBottons.route) },
+                onClick = {
+                    if(NetworkHelper.isNetworkAvailable(context)) {
+                        navController.navigate(ScreenRoute.AlarmBottons.route)
+                    }else{
+                Toast.makeText(context, context.getString(R.string.no_internet_connection), Toast.LENGTH_SHORT).show()
+            }
+        },
                 containerColor = Color.White
             ) {
                 Icon(imageVector = Icons.Default.Notifications, contentDescription = "Add", tint = BlueLight)

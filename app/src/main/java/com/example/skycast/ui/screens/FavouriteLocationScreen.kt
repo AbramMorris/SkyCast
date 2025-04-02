@@ -2,6 +2,7 @@ package com.example.skycast.ui.screens
 
 import android.location.Geocoder
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -67,6 +68,7 @@ import com.example.skycast.viewmodel.WeatherViewModel
 import com.example.skycast.ui.theme.BlueLight
 import com.example.skycast.ui.navigation.ScreenRoute
 import com.example.skycast.util.MAP_KEY
+import com.example.skycast.util.NetworkHelper
 import com.example.skycast.util.getLatLngFromCity
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -104,7 +106,13 @@ fun FavouriteLocationScreen(navController: NavController, viewModel: WeatherView
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate(ScreenRoute.MapWithMarkers.route) },
+                onClick = {
+                    if(NetworkHelper.isNetworkAvailable(context)){
+
+                    navController.navigate(ScreenRoute.MapWithMarkers.route)
+                    } else{
+                      Toast.makeText(context, context.getString(R.string.no_internet_connection), Toast.LENGTH_SHORT).show()
+                    } },
                 containerColor = Color.White
             ) {
                 Icon(imageVector = Icons.Default.Favorite, contentDescription = "Add", tint = BlueLight)
