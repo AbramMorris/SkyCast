@@ -5,6 +5,7 @@ import android.content.Context
 import android.location.Geocoder
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.os.Build
 import android.util.Log
 import androidx.work.WorkManager
 import com.example.skycast.data.enums.LanguageDisplay
@@ -254,3 +255,10 @@ fun mapLocationLocatorToArabic(location: String): String {
         }
     }
 
+fun getSystemLanguage(context: Context): String {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        context.resources.configuration.locales[0].language
+    } else {
+        context.resources.configuration.locale.language
+    }
+}

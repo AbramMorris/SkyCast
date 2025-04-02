@@ -117,7 +117,7 @@ fun SwipeToDeleteAlarm(
             if (it == DismissValue.DismissedToStart || it == DismissValue.DismissedToEnd) {
                 coroutineScope.launch {
                     viewModel.deleteAlarm(alarm)
-                    cancelAlarm(context, alarm)
+                    cancelAlarm(context, alarm.id)
                     cancelAlarmWorker(context, alarm.id)
                 }
             }
