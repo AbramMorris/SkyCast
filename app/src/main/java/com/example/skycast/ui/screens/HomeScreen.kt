@@ -365,7 +365,8 @@ fun WeatherDetailsRow(weather: WeatherResponse, selectedLanguage: String, windUn
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel) {
+fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel,notificationLatitude: Double=-1.0,
+                       notificationLongitude: Double) {
     val context = LocalContext.current
     val weatherState by viewModel.weatherState.collectAsState()
     val forecastState by viewModel.forecastState.collectAsState()
@@ -374,6 +375,13 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
     val windUnit = getWindSpeedUnit(context)
 
     LaunchedEffect(locationSetting) {
+
+//        if (notificationLatitude != -1.0 && notificationLongitude != -1.0) {
+//            val lang = loadLanguagePreference(context)
+//            val tempUnit = getTemperatureUnit(context, "Temp")
+//            viewModel.fetchWeather(notificationLongitude, notificationLatitude, lang, tempUnit, context)
+//            viewModel.fetchWeatherForecast(notificationLongitude, notificationLatitude, lang, tempUnit, context)
+//        }
         if (locationSetting == "GPS") {
             LocationHelper(context).getFreshLocation { location ->
                 val lang = loadLanguagePreference(context)
@@ -381,7 +389,10 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
                 if (location != null) {
                     viewModel.fetchWeather(location.latitude, location.longitude, lang, tempUnit, context)
                     viewModel.fetchWeatherForecast(location.latitude, location.longitude, lang, tempUnit, context)
-                } else {
+                    Log.d("TAG", "HomeForecastScreen: ${location.latitude}")
+                }
+
+                else {
                     viewModel.fetchWeather(-0.13, 51.51, "en", "metric",context)
                     viewModel.fetchWeatherForecast(51.51, -0.13, "en", "metric", context)
                 }
@@ -407,14 +418,16 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
     }
 
     // Network status handling
+    LaunchedEffect(Unit) {
         if (!NetworkHelper.isNetworkAvailable(context)) {
             Toast.makeText(
                 context,
-                stringResource(R.string.this_is_the_last_data_when_you_are_connected_to_the_internet),
+                context.getString(R.string.this_is_the_last_data_when_you_are_connected_to_the_internet),
                 Toast.LENGTH_SHORT
             ).show()
         } else if (shouldShowNetworkToast(context)) {
             Toast.makeText(context, "Network Available", Toast.LENGTH_SHORT).show()
+        }
         }
 
 

@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
 
 
@@ -38,7 +39,8 @@
             android:value="AIzaSyCWWYJtCejwVw1rfb7WjiMYTc23XtQF2SQ" />
         <receiver
             android:name=".data.alarm.AlarmReceiver"
-            android:exported="false">
+            android:exported="true"
+            android:enabled="true" >
             <intent-filter>
                 <action
                     android:name="com.example.skycast.ALARM_ACTION" />
@@ -46,7 +48,7 @@
         </receiver>
         <receiver android:name=".data.alarm.BootReceiver"
             android:enabled="true"
-            android:exported="false">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
