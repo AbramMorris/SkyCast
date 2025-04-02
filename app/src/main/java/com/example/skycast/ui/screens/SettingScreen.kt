@@ -1,6 +1,7 @@
 package com.example.skycast.ui.screens
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,6 +40,7 @@ import com.example.skycast.data.models.Response
 import com.example.skycast.ui.navigation.ScreenRoute
 import com.example.skycast.viewmodel.WeatherViewModel
 import com.example.skycast.ui.theme.BlueLight
+import com.example.skycast.util.NetworkHelper
 import com.example.skycast.util.getLocationMethod
 import com.example.skycast.util.getSystemLanguage
 import com.example.skycast.util.getTemperatureUnit
@@ -170,6 +172,7 @@ fun SettingsScreen( navController: NavController, viewModel: WeatherViewModel) {
 
 @Composable
 fun SettingSection(title: String, options: List<String>, selectedOption: String, onOptionSelected: (String) -> Unit) {
+    val context = LocalContext.current
     Column(modifier = Modifier.padding(vertical = 8.dp)) {
         Text(text = title, fontSize = 18.sp, fontWeight = FontWeight.Medium, color = Color.White)
         Row(
@@ -181,7 +184,13 @@ fun SettingSection(title: String, options: List<String>, selectedOption: String,
         ) {
             options.forEach { option ->
                 Button(
-                    onClick = { onOptionSelected(option) },
+                    onClick = {
+                        if(NetworkHelper.isNetworkAvailable(context)){
+                        onOptionSelected(option)
+                        }else{
+                            Toast.makeText(context, context.getString(R.string.no_internet_connection), Toast.LENGTH_SHORT).show()
+                        }
+                              },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (option == selectedOption) BlueLight else Color.LightGray,
                         contentColor = if (option == selectedOption) Color.White else Color.Black
