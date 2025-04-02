@@ -11,6 +11,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -136,12 +139,12 @@ class MainActivity : ComponentActivity() {
                        notificationLongitude: Double) {
         val navController = rememberNavController()
         val context = LocalContext.current
-//        val isNetworkAvailable = remember { mutableStateOf(true) }
+        val isNetworkAvailable = remember { mutableStateOf(true) }
 
 
-//        LaunchedEffect(Unit) {
-//            isNetworkAvailable.value = NetworkHelper.isNetworkAvailable(context)
-//        }
+        LaunchedEffect(Unit) {
+            isNetworkAvailable.value = NetworkHelper.isNetworkAvailable(context)
+        }
         Scaffold(
             modifier = Modifier
                 .fillMaxSize(),
@@ -154,8 +157,8 @@ class MainActivity : ComponentActivity() {
                 navBar(navController)
                 }
             },
-            topBar = {
-//                if (!isNetworkAvailable.value) {
+//            topBar = {
+//                AnimatedVisibility(visible = !isNetworkAvailable.value, enter = fadeIn(), exit = fadeOut()){
 //                    Box(
 //                        modifier = Modifier
 //                            .fillMaxWidth()
@@ -168,8 +171,9 @@ class MainActivity : ComponentActivity() {
 //                            modifier = Modifier.padding(8.dp)
 //                        )
 //                    }
+//
 //                }
-            }
+//            }
         ) { paddingValues ->
             Box(modifier = Modifier.padding(paddingValues)) {
                 AppNavGraph(navController = navController, viewModel = viewModel , alarmViewModel = alarmViewModel,notificationLatitude,notificationLongitude)

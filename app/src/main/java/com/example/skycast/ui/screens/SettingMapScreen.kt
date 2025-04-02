@@ -73,6 +73,8 @@ fun SettingMapScreen(viewModel: WeatherViewModel, navController: NavController) 
                     Log.i("mapppp", "lat = ${latLng.latitude}")
                     viewModel.updateSelectedLocation(locationName, latLng.latitude, latLng.longitude)
                     viewModel.updateSelectedHomeLocation(locationName, latLng.latitude, latLng.longitude, context)
+                    viewModel.fetchWeather(latLng.longitude, latLng.latitude, "en", "metric", context)
+                    viewModel.fetchWeatherForecast(latLng.latitude, latLng.longitude, "en", "metric", context)
                 }
             ) {
                 selectedHome?.let { location ->
