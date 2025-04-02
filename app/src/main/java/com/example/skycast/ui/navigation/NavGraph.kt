@@ -42,10 +42,10 @@ import com.example.skycast.viewmodel.AlarmViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun AppNavGraph(navController: NavHostController, viewModel: WeatherViewModel, alarmViewModel: AlarmViewModel) {
+fun AppNavGraph(navController: NavHostController, viewModel: WeatherViewModel, alarmViewModel: AlarmViewModel, notificationLatitude: Double,notificationLongitude: Double) {
     NavHost(navController = navController, startDestination = ScreenRoute.Splash.route) {
         composable(ScreenRoute.Splash.route) { SplashScreen(navController) }
-        composable(ScreenRoute.Home.route) { HomeForecastScreen(navController, viewModel) }
+        composable(ScreenRoute.Home.route) { HomeForecastScreen(navController, viewModel,notificationLatitude,notificationLongitude) }
         composable(ScreenRoute.Locations.route) { FavouriteLocationScreen(navController, viewModel) }
         composable(ScreenRoute.Setting.route) { SettingsScreen(navController, viewModel) }
         composable(ScreenRoute.MapWithMarkers.route) { MapSelectionScreen( viewModel, navController) }

@@ -1,6 +1,7 @@
 package com.example.skycast
 
 
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Build
@@ -53,12 +54,15 @@ class MainActivity : ComponentActivity() {
         locationHelper = LocationHelper(this)
         locationState = mutableStateOf<Location?>(null)
         enableEdgeToEdge()
+        val lng = intent.getDoubleExtra("longitude", -1.0)
+        val lat = intent.getDoubleExtra("latitude", -1.0)
+        Log.d("TAG", "onCreate: $lat $lng")
+
 
         applyLanguage(loadLanguagePreference(this))
         Log.d("loadLanguagePreference", "onCreate: ${loadLanguagePreference(this)}")
         setContent {
-
-            MainNavigation()
+            MainNavigation(lat,lng)
             val apiService = WeatherApiServes.create()
             val remoteDataSource = WeatherRemoteDataSourceImpl(apiService)
             val local = LocalDataSource(AppDatabase.getDatabase(this).locationDao())
@@ -115,7 +119,8 @@ class MainActivity : ComponentActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     @Composable
-    fun MainNavigation() {
+    fun MainNavigation(notificationLatitude: Double,
+                       notificationLongitude: Double) {
         val navController = rememberNavController()
         Scaffold(
             modifier = Modifier
@@ -131,7 +136,7 @@ class MainActivity : ComponentActivity() {
             }
         ) { paddingValues ->
             Box(modifier = Modifier.padding(paddingValues)) {
-                AppNavGraph(navController = navController, viewModel = viewModel , alarmViewModel = alarmViewModel)
+                AppNavGraph(navController = navController, viewModel = viewModel , alarmViewModel = alarmViewModel,notificationLatitude,notificationLongitude)
             }
         }
     }
@@ -144,5 +149,23 @@ class MainActivity : ComponentActivity() {
         config.setLocale(locale)
         resources.updateConfiguration(config, resources.displayMetrics)
     }
+
+//    override fun onNewIntent(intent: Intent) {
+//        super.onNewIntent(intent)
+//        handleNotificationIntent(intent)
+//    }
+//
+//    private fun handleNotificationIntent(intent: Intent?,) {
+//        if (intent?.getBooleanExtra("from_notification", false) == true) {
+//            val lat = intent.getDoubleExtra("latitude", -1.0)
+//            val lng = intent.getDoubleExtra("longitude", -1.0)
+//
+//            if (lat != -1.0 && lng != -1.0) {
+//                navController.navigate("${ScreenRoute.Home.route}?lat=$lat&lng=$lng") {
+//                    popUpTo(ScreenRoute.Home.route) { inclusive = true }
+//                }
+//            }
+//        }
+//    }
 
 }

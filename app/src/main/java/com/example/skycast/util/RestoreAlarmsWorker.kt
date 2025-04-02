@@ -17,7 +17,7 @@ class RestoreAlarmsWorker(context: Context, workerParams: WorkerParameters) :
         val alarmRepo = AlarmRepoImp(alarmLocal)
 
         return try {
-            alarmRepo.getAllAlarms().collect { alarms ->
+            alarmRepo.getAllAlarms() .collect { alarms ->
                 alarms.forEach { alarm ->
                     scheduleAlarm(applicationContext, alarm)
                 }
