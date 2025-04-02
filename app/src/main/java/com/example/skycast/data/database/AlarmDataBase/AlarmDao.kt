@@ -2,6 +2,8 @@ package com.example.skycast.data.database.AlarmDataBase
 
 import androidx.room.*
 import com.example.skycast.data.models.AlarmEntity
+import com.example.skycast.data.models.Response
+import kotlinx.coroutines.flow.Flow
 
 
 @Dao
@@ -16,5 +18,5 @@ interface AlarmDao {
     suspend fun deleteAlarm(alarm: AlarmEntity)
 
     @Query("SELECT * FROM alarms ORDER BY hour, minute ASC")
-    fun getAllAlarms(): kotlinx.coroutines.flow.Flow<List<AlarmEntity>>
+    fun getAllAlarms(): Flow<List<AlarmEntity>>
 }

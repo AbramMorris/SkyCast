@@ -37,14 +37,15 @@ class AlarmViewModel(private val AlarmRepository: AlarmRepository) : ViewModel()
             AlarmRepository.updateAlarm(alarm)
         }
     }
+
+//    fun updateSelectedAlarmLocation(name: String, lat: Double, lon: Double) {
+//        _selectedAlarmLocation.value = Triple(name, lat, lon)
+//        sendLocationToWeatherViewModel() // Send location to WeatherViewModel
+//    }
+//
+//    fun sendLocationToWeatherViewModel() {
+//        val (locationName, latitude, longitude) = _selectedAlarmLocation.value
+//        weatherViewModel.updateSelectedLocation(locationName, longitude, latitude)
+//    }
 }
 
-class AlertViewModelFactory(private val repository: AlarmRepository) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(AlarmViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return AlarmViewModel(repository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}

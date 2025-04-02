@@ -4,16 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.skycast.data.database.AlarmDataBase.AlarmLocalDataSource
 import com.example.skycast.data.models.AlarmEntity
+import com.example.skycast.data.models.Response
 import com.example.skycast.viewmodel.AlarmViewModel
 import com.example.skycast.viewmodel.WeatherViewModel
 import kotlinx.coroutines.flow.Flow
-
-interface AlarmRepository{
-    suspend fun insertAlarm(alarm: AlarmEntity)
-    fun getAllAlarms(): Flow<List<AlarmEntity>>
-    suspend fun deleteAlarm(alarm: AlarmEntity)
-    suspend fun updateAlarm(alarm: AlarmEntity)
-}
 
 class AlarmRepoImp( private val localDataSource: AlarmLocalDataSource) :AlarmRepository {
     override suspend fun insertAlarm(alarm: AlarmEntity) {
