@@ -69,132 +69,6 @@ import com.example.skycast.util.shouldShowNetworkToast
 
 
 
-
-@Composable
-fun FutureModelViewHolder(forecast: WeatherForecastResponse.ForecastItem) {
-    val context = LocalContext.current
-    val formattedTemp = formatNumberBasedOnLanguage(forecast.main.temp.toInt().toString())
-    val formattedUnit = formatTemperatureUnitBasedOnLanguage((getTemperatureUnit(context, "Temp") ?: "C"), getTemperatureUnit(context, "Lang") ?: "en")
-
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Image(
-            painter = painterResource(id = getWeatherIcon(forecast.weather.firstOrNull()?.main)),
-            contentDescription = stringResource(R.string.weather_icon),
-            modifier = Modifier.size(50.dp)
-        )
-        Text(
-            text = "$formattedTemp $formattedUnit",
-            color = Color.White,
-            fontSize = 16.sp
-        )
-        Text(
-            text = formatNumberBasedOnLanguage(forecast.dt_txt.substring(11, 16)), // Extracts time
-            color = Color.LightGray,
-            fontSize = 14.sp
-        )
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun WeeklyForecast(forecastState: WeatherForecastResponse?) {
-    val context = LocalContext.current
-    forecastState?.let { forecast ->
-        val dailyAverages = forecast.list
-            .groupBy { it.dt_txt.substring(0, 10) }
-            .mapValues { (_, dailyData) ->
-                val avgTemp = dailyData.map { it.main.temp }.average().toInt()
-                val weatherIcon = dailyData.firstOrNull()?.weather?.firstOrNull()?.icon
-                avgTemp to weatherIcon
-            }
-            .toList()
-            .take(5)
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp)
-        ) {
-            dailyAverages.forEachIndexed { _, (date, data) ->
-                val (avgTemp, iconRes) = data
-                val formattedTemp = formatNumberBasedOnLanguage(avgTemp.toString())
-                val formattedUnit = formatTemperatureUnitBasedOnLanguage(getTemperatureUnit(context, "Temp") ?: "C", getTemperatureUnit(context, "Lang") ?: "en")
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp)
-                        .padding(vertical = 10.dp)
-                        .background(BlueBlackBack, shape = RoundedCornerShape(10.dp))
-                        .padding(20.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text =  getDayNameFromDate(date),
-                        color = Color.White,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "$formattedTemp $formattedUnit",
-                        color = Color.White,
-                        fontSize = 20.sp
-                    )
-                    Image(
-                        painter = painterResource(id = getWeatherIcon(iconRes)),
-                        contentDescription = stringResource(R.string.weather_icon)
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun WeatherDetailsRow(weather: WeatherResponse, selectedLanguage: String, windUnit: String) {
-    Box(
-        modifier = Modifier
-            .width(700.dp)
-            .height(150.dp)
-            .padding(horizontal = 24.dp, vertical = 16.dp)
-            .background(
-                BlueBlackBack,
-                shape = RoundedCornerShape(16.dp)
-            )
-    ) {
-        Row(
-            modifier = Modifier
-                .width(700.dp)
-                .height(150.dp)
-                .padding(horizontal = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            WeatherDetailItem(
-                icon = R.drawable.humidity,
-                value = formatNumberBasedOnLanguage("${weather.main.humidity}") + "%",
-                label = stringResource(R.string.humidity)
-            )
-            WeatherDetailItem(
-                icon = R.drawable.wind,
-                value = formatNumberBasedOnLanguage("${weather.wind.speed}") + windUnit,
-                label = stringResource(R.string.wind)
-            )
-            WeatherDetailItem(
-                icon = R.drawable.pressure,
-                value = formatNumberBasedOnLanguage("${weather.main.pressure}") + stringResource(R.string.hpa),
-                label = stringResource(R.string.pressure)
-            )
-            WeatherDetailItem(
-                icon = R.drawable.cloudy,
-                value = formatNumberBasedOnLanguage("${weather.clouds.all}"),
-                label = stringResource(R.string.clouds)
-            )
-        }
-    }
-}
-
-
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel,notificationLatitude: Double=-1.0,
@@ -262,7 +136,7 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
         } else if (shouldShowNetworkToast(context)) {
             Toast.makeText(context, "Network Available", Toast.LENGTH_SHORT).show()
         }
-        }
+    }
 
 
     Box(
@@ -406,6 +280,131 @@ fun HomeForecastScreen(navController: NavController, viewModel: WeatherViewModel
                     }
                 }
             }
+        }
+    }
+}
+
+
+@Composable
+fun FutureModelViewHolder(forecast: WeatherForecastResponse.ForecastItem) {
+    val context = LocalContext.current
+    val formattedTemp = formatNumberBasedOnLanguage(forecast.main.temp.toInt().toString())
+    val formattedUnit = formatTemperatureUnitBasedOnLanguage((getTemperatureUnit(context, "Temp") ?: "C"), getTemperatureUnit(context, "Lang") ?: "en")
+
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Image(
+            painter = painterResource(id = getWeatherIcon(forecast.weather.firstOrNull()?.main)),
+            contentDescription = stringResource(R.string.weather_icon),
+            modifier = Modifier.size(50.dp)
+        )
+        Text(
+            text = "$formattedTemp $formattedUnit",
+            color = Color.White,
+            fontSize = 16.sp
+        )
+        Text(
+            text = formatNumberBasedOnLanguage(forecast.dt_txt.substring(11, 16)), // Extracts time
+            color = Color.LightGray,
+            fontSize = 14.sp
+        )
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun WeeklyForecast(forecastState: WeatherForecastResponse?) {
+    val context = LocalContext.current
+    forecastState?.let { forecast ->
+        val dailyAverages = forecast.list
+            .groupBy { it.dt_txt.substring(0, 10) }
+            .mapValues { (_, dailyData) ->
+                val avgTemp = dailyData.map { it.main.temp }.average().toInt()
+                val weatherIcon = dailyData.firstOrNull()?.weather?.firstOrNull()?.icon
+                avgTemp to weatherIcon
+            }
+            .toList()
+            .take(5)
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp)
+        ) {
+            dailyAverages.forEachIndexed { _, (date, data) ->
+                val (avgTemp, iconRes) = data
+                val formattedTemp = formatNumberBasedOnLanguage(avgTemp.toString())
+                val formattedUnit = formatTemperatureUnitBasedOnLanguage(getTemperatureUnit(context, "Temp") ?: "C", getTemperatureUnit(context, "Lang") ?: "en")
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                        .padding(vertical = 10.dp)
+                        .background(BlueBlackBack, shape = RoundedCornerShape(10.dp))
+                        .padding(20.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text =  getDayNameFromDate(date),
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "$formattedTemp $formattedUnit",
+                        color = Color.White,
+                        fontSize = 20.sp
+                    )
+                    Image(
+                        painter = painterResource(id = getWeatherIcon(iconRes)),
+                        contentDescription = stringResource(R.string.weather_icon)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun WeatherDetailsRow(weather: WeatherResponse, selectedLanguage: String, windUnit: String) {
+    Box(
+        modifier = Modifier
+            .width(700.dp)
+            .height(150.dp)
+            .padding(horizontal = 24.dp, vertical = 16.dp)
+            .background(
+                BlueBlackBack,
+                shape = RoundedCornerShape(16.dp)
+            )
+    ) {
+        Row(
+            modifier = Modifier
+                .width(700.dp)
+                .height(150.dp)
+                .padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            WeatherDetailItem(
+                icon = R.drawable.humidity,
+                value = formatNumberBasedOnLanguage("${weather.main.humidity}") + "%",
+                label = stringResource(R.string.humidity)
+            )
+            WeatherDetailItem(
+                icon = R.drawable.wind,
+                value = formatNumberBasedOnLanguage("${weather.wind.speed}") + windUnit,
+                label = stringResource(R.string.wind)
+            )
+            WeatherDetailItem(
+                icon = R.drawable.pressure,
+                value = formatNumberBasedOnLanguage("${weather.main.pressure}") + stringResource(R.string.hpa),
+                label = stringResource(R.string.pressure)
+            )
+            WeatherDetailItem(
+                icon = R.drawable.cloudy,
+                value = formatNumberBasedOnLanguage("${weather.clouds.all}"),
+                label = stringResource(R.string.clouds)
+            )
         }
     }
 }
