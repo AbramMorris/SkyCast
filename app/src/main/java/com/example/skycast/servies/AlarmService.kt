@@ -48,8 +48,8 @@ class AlarmService : Service(), TextToSpeech.OnInitListener {
 
                     CoroutineScope(Dispatchers.IO).launch {
                         val coordinates = fetchNotData()
-                        val latitude = coordinates?.first ?: 40.7128  // Default if null
-                        val longitude = coordinates?.second ?: -74.0060  // Default if null
+                        val latitude = coordinates?.first ?: 40.7128
+                        val longitude = coordinates?.second ?: -74.0060
                         val alarmId = coordinates?.third ?: 0
                         updateNotification(message, latitude, longitude,alarmId)
                     }
@@ -58,7 +58,7 @@ class AlarmService : Service(), TextToSpeech.OnInitListener {
                     playNotificationSound()
                 }
                 stopAction -> {
-                    stopSelf() // Stop the service when the button is clicked
+                    stopSelf()
                 }
             }
         }
@@ -111,9 +111,6 @@ class AlarmService : Service(), TextToSpeech.OnInitListener {
             snoozeIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-
-
-        // Create an Intent to open the Home screen and pass latitude and longitude
         val homeIntent = Intent(this, MainActivity::class.java).apply {
             putExtra("latitude", latitude)
             putExtra("longitude", longitude)

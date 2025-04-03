@@ -119,7 +119,7 @@ fun SettingMapScreen(viewModel: WeatherViewModel, navController: NavController) 
                                 val lng = selectedHome!!.third
                                 Log.i("lattttttt", "lat = $lat")
                                 viewModel.updateSelectedHomeLocation(cityName, lat, lng, context)
-                                navController.navigate(ScreenRoute.Home.route)
+                                navController.navigate(ScreenRoute.Setting.route)
 
                             }
                         },
