@@ -17,8 +17,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class AlarmViewModelTest  {
-    @get:Rule
-    var instanceExecuteRule = InstantTaskExecutorRule()
 
     lateinit var viewModel: AlarmViewModel
     lateinit var fakeRepo : AlarmFakeRepo
@@ -34,17 +32,17 @@ class AlarmViewModelTest  {
 
     }
     @Test
-    fun insertAlert_AndCheckTheListisNotEmpty()= runTest {
-        // when->call insert Method
+    fun insertAlarm_AndCheckTheListisNotEmpty()= runTest {
+
         viewModel.insertAlarm(alarm1)
-        // then -> check the result
+
         var value = viewModel._selectedAlarmLocation.getOrAwaitValue {  }
         assertThat(value, not(nullValue()))
 
     }
     @Test
-    fun deleteAlert_CheckTheListIsEmpty() = runTest {
-        // when-> Call insert and delete Methods
+    fun deleteAlarm_CheckTheListIsEmpty() = runTest {
+
         viewModel.insertAlarm(alarm1)
         viewModel.deleteAlarm(alarm1)
 
@@ -53,8 +51,8 @@ class AlarmViewModelTest  {
 
     }
     @Test
-    fun getAlerts_CheckTheListIsNotEmpty() = runTest {
-        // when-> Call insert Method
+    fun getAlarm_CheckTheListIsNotEmpty() = runTest {
+
         viewModel.insertAlarm(alarm1)
         viewModel.insertAlarm(alarm2)
         viewModel.getAllAlarms()
