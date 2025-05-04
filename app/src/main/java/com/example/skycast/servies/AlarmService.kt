@@ -120,7 +120,7 @@ class AlarmService : Service(), TextToSpeech.OnInitListener {
         )
 
         return NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.logo)
+            .setSmallIcon(R.drawable.storm)
             .setContentTitle("Weather Alert")
             .setContentText(contentText)
             .setPriority(NotificationCompat.PRIORITY_HIGH)

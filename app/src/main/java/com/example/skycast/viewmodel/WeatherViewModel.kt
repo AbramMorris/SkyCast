@@ -85,6 +85,7 @@ class WeatherViewModel(
                         onSuccess = { weather ->
                             _weatherState.value = Response.Success(weather)
                             cacheHomeData(weather, null)
+                            Log.d("wether", "Weather data cached: $weather")
                         },
                         onFailure = { error ->
                             _weatherState.value = Response.Failure(error)
@@ -213,20 +214,34 @@ class WeatherViewModel(
         }
     }
 
-    private fun cacheHomeData(weather: WeatherResponse?, forecast: WeatherForecastResponse?) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val existingHome = homeCacheRepo.getHome()
-                val home = existingHome.copy(
+
+private fun cacheHomeData(weather: WeatherResponse?, forecast: WeatherForecastResponse?) {
+    viewModelScope.launch(Dispatchers.IO) {
+        try {
+            Log.d("homeee", "Caching home data...")
+            val existingHome = homeCacheRepo.getHome()
+            Log.d("homeee", "Existing home data: $existingHome")
+
+            val home = if (existingHome != null) {
+                existingHome.copy(
                     weatherPojo = weather?.let { listOf(it) } ?: existingHome.weatherPojo,
                     forecastPojo = forecast?.let { listOf(it) } ?: existingHome.forecastPojo
                 )
-                homeCacheRepo.insertHome(home)
-            } catch (e: Exception) {
-                Log.e("WeatherViewModel", "Error caching data: ${e.message}")
+            } else {
+                HomeCached(
+                    weatherPojo = weather?.let { listOf(it) } ?: emptyList(),
+                    forecastPojo = forecast?.let { listOf(it) } ?: emptyList()
+                )
             }
+
+            homeCacheRepo.insertHome(home)
+            Log.d("homeee", "Home data cached: $home")
+        } catch (e: Exception) {
+            Log.e("homeee", "Error caching data: ${e.message}")
         }
     }
+}
+
 
     fun setLocationMethod(method: String) {
         _locationMethod.value = method
