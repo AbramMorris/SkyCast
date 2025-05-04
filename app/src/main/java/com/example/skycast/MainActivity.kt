@@ -27,6 +27,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -47,9 +49,11 @@ import com.example.skycast.data.repo.WeatherRepositoryImpl
 import com.example.skycast.ui.navigation.AppNavGraph
 import com.example.skycast.ui.navigation.ScreenRoute
 import com.example.skycast.ui.navigation.navBar
+import com.example.skycast.util.ConnectivityObserver
 import com.example.skycast.util.LocationHelper
 import com.example.skycast.util.NetworkHelper
 import com.example.skycast.util.REQUEST_LOCATION_PERMISSION
+import com.example.skycast.util.checkForInternet
 import com.example.skycast.util.loadLanguagePreference
 import com.example.skycast.viewmodel.AlarmViewModel
 import com.example.skycast.viewmodel.AlertViewModelFactory
@@ -73,12 +77,13 @@ class MainActivity : ComponentActivity() {
         val lng = intent.getDoubleExtra("longitude", -1.0)
         val lat = intent.getDoubleExtra("latitude", -1.0)
         Log.d("TAG", "onCreate: $lat $lng")
+        val connectivityObserver = ConnectivityObserver(applicationContext)
 
 
         applyLanguage(loadLanguagePreference(this))
         Log.d("loadLanguagePreference", "onCreate: ${loadLanguagePreference(this)}")
         setContent {
-            MainNavigation(lat,lng)
+            MainNavigation(lat,lng,connectivityObserver)
             val apiService = WeatherApiServes.create()
             val remoteDataSource = WeatherRemoteDataSourceImpl(apiService)
             val local = LocalDataSource(AppDatabase.getDatabase(this).locationDao())
@@ -136,13 +141,19 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun MainNavigation(notificationLatitude: Double,
-                       notificationLongitude: Double) {
+                       notificationLongitude: Double, connectivityObserver: ConnectivityObserver) {
         val navController = rememberNavController()
         val context = LocalContext.current
         val isNetworkAvailable = remember { mutableStateOf(true) }
 
+        val isConnected by connectivityObserver.isConnected.collectAsState(
+            initial = checkForInternet(this)
+        )
 
         LaunchedEffect(Unit) {
+            connectivityObserver.isConnected.collect { isConnected ->
+                isNetworkAvailable.value = isConnected
+            }
             isNetworkAvailable.value = NetworkHelper.isNetworkAvailable(context)
         }
         Scaffold(
@@ -157,7 +168,7 @@ class MainActivity : ComponentActivity() {
                 navBar(navController)
                 }
             },
-//            topBar = {
+            topBar = {
 //                AnimatedVisibility(visible = !isNetworkAvailable.value, enter = fadeIn(), exit = fadeOut()){
 //                    Box(
 //                        modifier = Modifier
@@ -173,7 +184,7 @@ class MainActivity : ComponentActivity() {
 //                    }
 //
 //                }
-//            }
+            }
         ) { paddingValues ->
             Box(modifier = Modifier.padding(paddingValues)) {
                 AppNavGraph(navController = navController, viewModel = viewModel , alarmViewModel = alarmViewModel,notificationLatitude,notificationLongitude)

@@ -49,7 +49,7 @@ fun AppNavGraph(navController: NavHostController, viewModel: WeatherViewModel, a
         composable(ScreenRoute.Locations.route) { FavouriteLocationScreen(navController, viewModel) }
         composable(ScreenRoute.Setting.route) { SettingsScreen(navController, viewModel) }
         composable(ScreenRoute.MapWithMarkers.route) { MapSelectionScreen( viewModel, navController) }
-        composable(ScreenRoute.Details.route) { DetailsScreen(navController, 0.0, 0.0, viewModel) }
+//        composable(ScreenRoute.Details.route) { DetailsScreen(navController, 0.0, 0.0, viewModel) }
         composable(
             route = "${ScreenRoute.Details.route}/{latitude}/{longitude}",
             arguments = listOf(navArgument("latitude") { type = NavType.StringType }, navArgument("longitude") { type = NavType.StringType }))
